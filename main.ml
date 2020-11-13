@@ -1,8 +1,10 @@
-
+open Lsystems
+open Systems
 (** Gestion des arguments de la ligne de commande.
     Nous suggérons l'utilisation du module Arg
     http://caml.inria.fr/pub/docs/manual-ocaml/libref/Arg.html
 *)
+
 
 let usage = (* Entete du message d'aide pour --help *)
   "Interpretation de L-systemes et dessins fractals"
@@ -17,6 +19,7 @@ let extra_arg_action = fun s -> failwith ("Argument inconnu :"^s)
 
 let main () =
   Arg.parse cmdline_options extra_arg_action usage;
+  interprete "./examples/koch.sys";
   print_string "Pour l'instant je ne fais rien\n"
 
 (** On ne lance ce main que dans le cas d'un programme autonome
