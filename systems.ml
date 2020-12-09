@@ -14,6 +14,25 @@ type 's system = {
 
 (** Put here any type and function implementations concerning systems *)
 
+type symbol = A|P|M
+
+let system : symbol system =
+  let a = Symb A in
+  let p = Symb P in
+  let m = Symb M in
+  {
+    axiom = Seq [a;p;p;a;p;p;a];
+    rules =
+      (function
+       | A -> Seq [a;m;a;p;p;a;m;a]
+       | s -> Symb s);
+    interp =
+      (function
+       | A -> [Line 30]
+       | P -> [Turn 60]
+       | M -> [Turn (-60)])
+  }
+
 let is_comment line =
   if (String.length line) > 0 then (
   String.get line 0 = '#') else false
