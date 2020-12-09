@@ -19,7 +19,7 @@ let extra_arg_action = fun s -> failwith ("Argument inconnu :"^s)
 
 let main () =
   Arg.parse cmdline_options extra_arg_action usage;
-  interprete "./examples/koch.sys";
+  interpret_file "./examples/koch.sys";
   print_string "Pour l'instant je ne fais rien\n"
 
 (** On ne lance ce main que dans le cas d'un programme autonome

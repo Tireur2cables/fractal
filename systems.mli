@@ -14,4 +14,4 @@ type 's system = {
 
 (** Put here any type and function interfaces concerning systems *)
 
-val interprete : string -> unit
+val interpret_file : string -> unit
