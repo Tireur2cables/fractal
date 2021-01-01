@@ -1,4 +1,4 @@
-
+open Graphics
 (** Gestion des arguments de la ligne de commande.
     Nous suggérons l'utilisation du module Arg
     http://caml.inria.fr/pub/docs/manual-ocaml/libref/Arg.html
@@ -17,7 +17,9 @@ let extra_arg_action = fun s -> failwith ("Argument inconnu :"^s)
 
 let main () =
   Arg.parse cmdline_options extra_arg_action usage;
-  print_string "Pour l'instant je ne fais rien\n"
+  print_string "Pour l'instant je ne fais rien\n";
+  open_graph " 480x270";
+  close_graph
 
 (** On ne lance ce main que dans le cas d'un programme autonome
     (c'est-à-dire que l'on est pas dans un "toplevel" ocaml interactif).

@@ -1,15 +1,17 @@
 
+(** Turtle graphical commands *)
 type command =
-| Line of int
-| Move of int
-| Turn of int
-| Store
-| Restore
+| Line of int      (** advance turtle while drawing *)
+| Move of int      (** advance without drawing *)
+| Turn of int      (** turn turtle by n degrees *)
+| Store            (** save the current position of the turtle *)
+| Restore          (** restore the last saved position not yet restored *)
 
+(** Position and angle of the turtle *)
 type position = {
-  x: float;      (** position x *)
-  y: float;      (** position y *)
-  a: int;        (** angle of the direction *)
+  x: float;        (** position x *)
+  y: float;        (** position y *)
+  a: int;          (** angle of the direction *)
 }
 
 (** Put here any type and function implementations concerning turtle *)
