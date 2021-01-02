@@ -9,9 +9,24 @@ type command =
 
 (** Position and angle of the turtle *)
 type position = {
-  x: float;        (** position x *)
-  y: float;        (** position y *)
-  a: int;          (** angle of the direction *)
-}
+    x: float;        (** position x *)
+    y: float;        (** position y *)
+    a: float;        (** angle of the direction *)
+  }
+
+type turtle = {
+    current_pos: position;
+    saved_pos: position;
+  }
+
+exception Restoration_failure of string
 
 (** Put here any type and function signatures concerning turtle *)
+
+val pi : float
+
+val create_turtle : unit -> turtle
+
+val exec_command : turtle -> command -> turtle
+
+val exec_commands : turtle -> command list -> turtle
