@@ -121,10 +121,12 @@ let create_interp inter =
     | _ -> failwith "erreur"
   in
   let paires = List.map fun_aux rules_pair in
-  function s -> (match List.assoc_opt s paires with
-    | None -> failwith "erreur liste pas complete"
-    | Some r -> r
-  )
+  function s ->
+    begin
+      match List.assoc_opt s paires with
+      | None -> failwith "erreur liste pas complete"
+      | Some r -> r
+    end
 ;;
 
 let interpret_file file =

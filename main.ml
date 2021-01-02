@@ -49,7 +49,13 @@ let try_exec (t: turtle) (l: command list) : (turtle) =
 
 let interp_syst system degre =
   if degre = 0 then
-    system.interp (string_of_word system.axiom)
+    let s = string_of_word system.axiom in
+    let rec fun_aux s =
+      match s with
+      | "" -> []
+      | s -> (system.interp (String.make 1 s.[0])) @ (fun_aux (String.sub s 1 (String.length s - 1)))
+    in
+    fun_aux s
   else failwith "wip";
 ;;
 
