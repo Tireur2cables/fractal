@@ -1,4 +1,5 @@
 open Lsystems;;
+open Systems;;
 open Turtle;;
 open Graphics;;
 
@@ -46,15 +47,18 @@ let try_exec (t: turtle) (l: command list) : (turtle) =
      create_turtle ()
 ;;
 
+let interp_syst system degre =
+  if degre = 0 then
+    system.interp (string_of_word system.axiom)
+  else failwith "wip";
+;;
+
 let main () =
   Arg.parse cmdline_options extra_arg_action usage;
   open_window 800 800;
-  let list = [Move 200; Restore; Store; Turn 90; Move 200; Turn 270; Line 100; Turn 120; Line 100; Turn 120; Line 100;
-              Restore; Line 100; Turn 120; Line 100; Turn 120; Line 100] in
+  let system = interpret_file "./examples/test.sys" in
+  let list = interp_syst system 0 in
   let turtle = try_exec (create_turtle ()) list in
-  let list = [Move 200; Store; Turn 90; Move 200; Turn 270; Line 100; Turn 120; Line 100; Turn 120; Line 100;
-              Restore; Line 100; Turn 120; Line 100; Turn 120; Line 100] in
-  let turtle = try_exec turtle list in
   close_after_event ()
 ;;
 (** On ne lance ce main que dans le cas d'un programme autonome
