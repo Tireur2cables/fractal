@@ -47,6 +47,19 @@ let try_exec (t: turtle) (l: command list) : (turtle) =
      create_turtle ()
 ;;
 
+let rec rewrite_aux system degre res =
+  if degre = 0 then
+    res
+  else (
+    let result = res in
+    rewrite_aux system (degre-1) result
+  )
+;;
+
+let rewrite system degre =
+  rewrite_aux system degre system.axiom
+;;
+
 let interp_syst system degre =
   if degre = 0 then
     let s = string_of_word system.axiom in
