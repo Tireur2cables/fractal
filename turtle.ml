@@ -13,7 +13,3 @@ type position = {
 }
 
 (** Put here any type and function implementations concerning turtle *)
-
-let test = 
-  print_string "help"
-;;
