@@ -42,29 +42,36 @@ let is_space line =
   if (String.length line) = 0 then
     true else String.get line 0 = '\n';
 ;;
-let rec interpret_line file block =
+
+let rec interpret_line file block axiom rules inter  =
   try
     let x = input_line file in
     if is_comment x then (
-      interpret_line file block;
+      interpret_line file block axiom rules inter;
     )
     else (
       if is_space x then (
-        print_string "\n";
-        interpret_line file (block+1);
+        interpret_line file (block+1) axiom rules inter;
       )else (
-        print_int block;
-        print_string (" " ^ x);
-        print_string "\n";
-        interpret_line file block;
+        if block = 0 then(
+          interpret_line file block (axiom ^ x) rules inter;
+        )else if block = 1 then (
+          interpret_line file block axiom (rules ^ x) inter;
+        )
+        else(
+          interpret_line file block axiom rules (inter ^ x ^ ":");
+        )
       );
     );
-  with End_of_file -> print_string "fin";
+  with End_of_file -> (
+      (axiom, rules, inter);
+    )
 ;;
 
 let interpret_file file =
    let canal_in = open_in file in
-   interpret_line canal_in 0;
+   let (axiom, rules, inter) = interpret_line canal_in 0 "" "" "" in
+   let inter_list = String.split_on_char ':' inter in
    close_in canal_in;
 ;;
 
