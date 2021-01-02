@@ -6,6 +6,8 @@ open Graphics;;
     Nous suggérons l'utilisation du module Arg
     http://caml.inria.fr/pub/docs/manual-ocaml/libref/Arg.html
 *)
+
+
 let usage = (* Entete du message d'aide pour --help *)
   "Interpretation de L-systemes et dessins fractals"
 ;;
