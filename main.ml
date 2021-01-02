@@ -19,9 +19,6 @@ let extra_arg_action = fun s -> failwith ("Argument inconnu :"^s)
 
 let main () =
   Arg.parse cmdline_options extra_arg_action usage;
-  interpret_file "./examples/koch.sys";
-  print_string "Pour l'instant je ne fais rien\n"
-
 (** On ne lance ce main que dans le cas d'un programme autonome
     (c'est-à-dire que l'on est pas dans un "toplevel" ocaml interactif).
     Sinon c'est au programmeur de lancer ce qu'il veut *)
