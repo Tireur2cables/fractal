@@ -115,11 +115,19 @@ let create_rules rules =
 ;;
 
 let create_interp inter =
-  match String.get inter 0 with
-  | 'L' -> Turtle.Line (int_of_string (String.sub inter 1 ((String.length inter)-1)))
-  | 'M' -> Turtle.Move (int_of_string (String.sub inter 1 ((String.length inter)-1)))
-  | 'T' -> Turtle.Turn (int_of_string (String.sub inter 1 ((String.length inter)-1)))
-  | _ -> failwith "erreur"
+  let rules_list = String.split_on_char ':' inter in
+  let rules_pair = create_pair rules_list in
+  function s -> (match List.assoc_opt s rules_pair with
+    | None -> failwith "erreur liste pas complete"
+    | Some r ->
+      begin
+        match String.get r 0 with
+        | 'L' -> Turtle.Line (int_of_string (String.sub r 1 ((String.length r)-1)))
+        | 'M' -> Turtle.Move (int_of_string (String.sub r 1 ((String.length r)-1)))
+        | 'T' -> Turtle.Turn (int_of_string (String.sub r 1 ((String.length r)-1)))
+        | _ -> failwith "erreur"
+      end
+  )
 ;;
 
 let interpret_file file =
@@ -127,7 +135,7 @@ let interpret_file file =
    let (axiom, rules, inter) = interpret_line canal_in 0 "" "" "" in
    let ax = Seq (axiom_of_string axiom) in
    let ruless = create_rules rules in
-   let interp = create_interp (create_rules inter) in
+   let interp = create_interp in
    print_string axiom;
    print_string rules;
    print_string inter;
