@@ -47,17 +47,27 @@ let try_exec (t: turtle) (l: command list) : (turtle) =
      create_turtle ()
 ;;
 
-let rec rewrite_aux system degre res =
+let rec rewrite_aux turtle system degre symbol =
   if degre = 0 then
-    res
+    exec_commands turtle (system.interp symbol)
   else (
-    let result = res in
-    rewrite_aux system (degre-1) result
+    let res = string_of_word (system.rules symbol) in
+	let rec fun_aux turtle s =
+	  match s with
+	  | "" -> turtle
+	  | s -> fun_aux (rewrite_aux turtle system degre (String.make 1 s.[0])) ((String.sub s 1 (String.length s - 1)))
+	in
+  fun_aux turtle res
   )
 ;;
 
-let rewrite system degre =
-  rewrite_aux system degre system.axiom
+let rewrite turtle system degre =
+	let rec fun_aux turtle s =
+		match s with
+		| "" -> turtle
+		| s -> fun_aux (rewrite_aux turtle system degre (String.make 1 s.[0])) ((String.sub s 1 (String.length s - 1)))
+	in
+	fun_aux turtle (string_of_word system.axiom)
 ;;
 
 let interp_syst system degre =
@@ -76,8 +86,8 @@ let main () =
   Arg.parse cmdline_options extra_arg_action usage;
   open_window 800 800;
   let system = interpret_file "./examples/test.sys" in
-  let list = interp_syst system 0 in
-  let turtle = try_exec (create_turtle ()) list in
+  let turtle = (create_turtle ()) in
+  let turle_fin = rewrite turtle system 1 in
   close_after_event ()
 ;;
 (** On ne lance ce main que dans le cas d'un programme autonome

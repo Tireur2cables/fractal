@@ -17,3 +17,5 @@ type 's system = {
 val interpret_file : string -> string system
 
 val string_of_word : string word -> string
+
+val word_of_string : string -> string word
