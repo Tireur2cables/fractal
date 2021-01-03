@@ -16,7 +16,7 @@ type position = {
 
 type turtle = {
     current_pos: position;
-    saved_pos: position;
+    saved_pos: position list;
   }
 
 exception Restoration_failure of string
