@@ -50,44 +50,35 @@ let try_exec (t: turtle) (l: command list) : (turtle) =
 let rec rewrite_aux turtle system degre symbol =
   if degre = 0 then
     exec_commands turtle (system.interp symbol)
-  else (
-    let res = string_of_word (system.rules symbol) in
+  else
 	let rec fun_aux turtle s =
 	  match s with
 	  | "" -> turtle
-	  | s -> fun_aux (rewrite_aux turtle system (degre-1) (String.make 1 s.[0])) ((String.sub s 1 (String.length s - 1)))
+	  | s ->
+         let sub = String.sub s 1 (String.length s - 1) in
+         fun_aux (rewrite_aux turtle system (degre-1) (String.make 1 s.[0])) sub
 	in
-  fun_aux turtle res
-  )
+    let res = string_of_word (system.rules symbol) in (* ATTENTION : mise en mémoire des itérations *)
+    fun_aux turtle res
 ;;
 
 let rewrite turtle system degre =
 	let rec fun_aux turtle s =
 		match s with
 		| "" -> turtle
-		| s -> fun_aux (rewrite_aux turtle system degre (String.make 1 s.[0])) ((String.sub s 1 (String.length s - 1)))
+		| s ->
+           let sub = String.sub s 1 (String.length s - 1) in
+           fun_aux (rewrite_aux turtle system degre (String.make 1 s.[0])) sub
 	in
 	fun_aux turtle (string_of_word system.axiom)
-;;
-
-let interp_syst system degre =
-  if degre = 0 then
-    let s = string_of_word system.axiom in
-    let rec fun_aux s =
-      match s with
-      | "" -> []
-      | s -> (system.interp (String.make 1 s.[0])) @ (fun_aux (String.sub s 1 (String.length s - 1)))
-    in
-    fun_aux s
-  else failwith "wip";
 ;;
 
 let main () =
   Arg.parse cmdline_options extra_arg_action usage;
   open_window 800 800;
-  let system = interpret_file "./examples/dragon.sys" in
+  let system = interpret_file "./examples/br3.sys" in
   let turtle = (create_turtle ()) in
-  let turle_fin = rewrite turtle system 15 in
+  let turle_fin = rewrite turtle system 7 in
   close_after_event ()
 ;;
 (** On ne lance ce main que dans le cas d'un programme autonome
