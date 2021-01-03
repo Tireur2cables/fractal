@@ -14,30 +14,6 @@ type 's system = {
 
 (** Put here any type and function implementations concerning systems *)
 
-(**
-let rec word_map rules word =
-  match word with
-  | Symb s -> rules s
-  | Seq s ->
-    (match s with
-     | [] -> []
-     | w :: s -> word_map rules w @ word_map rules (Seq (s))
-    )
-  | Branch b -> word_map rules b
-;;
-
-let rewrite axiom rules degre =
-  if degre <= 1 then (
-    axiom;
-  )else (
-    match axiom with
-    | Symb s -> rules s
-    | Seq s -> word_map rules s
-    | Branch b -> rewrite b rules degre
-  )
-;;
-*)
-
 let is_comment line =
   if (String.length line) > 0 then (
   String.get line 0 = '#') else false
