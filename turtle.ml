@@ -27,11 +27,11 @@ exception Restoration_failure of string;;
 let pi = 4.0 *. atan 1.0;;
 
 let create_turtle () =
-  moveto 400 400; (* move to middle *)
+  moveto 400 0; (* move to middle bottom *)
   {current_pos = {
      x = float_of_int (current_x ());
      y = float_of_int (current_y ());
-     a = 0.}; (* default angle = 0 *)
+     a = 90.}; (* default angle = 90 = toward top of screen *)
   saved_pos = []} (* No saved postion *)
 ;;
 
