@@ -14,4 +14,8 @@ type 's system = {
 
 (** Put here any type and function interfaces concerning systems *)
 
-val interpret_file : string -> unit
+val interpret_file : string -> string system
+
+val string_of_word : string word -> string
+
+val word_of_string : string -> string word
