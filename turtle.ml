@@ -27,7 +27,7 @@ exception Restoration_failure of string;;
 let pi = 4.0 *. atan 1.0;;
 
 let create_turtle () =
-  moveto 0 0;
+  moveto 400 400;
   {current_pos = {
      x = float_of_int (current_x ());
      y = float_of_int (current_y ());

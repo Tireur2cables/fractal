@@ -55,7 +55,7 @@ let rec rewrite_aux turtle system degre symbol =
 	let rec fun_aux turtle s =
 	  match s with
 	  | "" -> turtle
-	  | s -> fun_aux (rewrite_aux turtle system degre (String.make 1 s.[0])) ((String.sub s 1 (String.length s - 1)))
+	  | s -> fun_aux (rewrite_aux turtle system (degre-1) (String.make 1 s.[0])) ((String.sub s 1 (String.length s - 1)))
 	in
   fun_aux turtle res
   )
@@ -85,9 +85,9 @@ let interp_syst system degre =
 let main () =
   Arg.parse cmdline_options extra_arg_action usage;
   open_window 800 800;
-  let system = interpret_file "./examples/test.sys" in
+  let system = interpret_file "./examples/dragon.sys" in
   let turtle = (create_turtle ()) in
-  let turle_fin = rewrite turtle system 1 in
+  let turle_fin = rewrite turtle system 15 in
   close_after_event ()
 ;;
 (** On ne lance ce main que dans le cas d'un programme autonome
