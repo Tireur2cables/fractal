@@ -105,13 +105,13 @@ let main () =
   Arg.parse cmdline_options extra_arg_action usage;
   open_window 800 800;
   let system = interpret_file "./examples/dragon.sys" in
-  let turtle = (create_turtle ()) in
   let turtle2 = (create_turtle ()) in
-  let dim = {ver = 0.; hor = 0.;} in
-  let (draw, turtlef) = calc turtle system 2 dim in
+  let dim = {ver = -10000.; hor = -10000.;} in
+  let (draw, turtlef) = calc turtle2 system 20 dim in
   print_float draw.hor;
   print_float draw.ver;
-  let turle_fin = rewrite turtle system 2 in
+  let turtle = (create_turtle ()) in
+  let turle_fin = rewrite turtle system 20 in
   close_after_event ()
 ;;
 (** On ne lance ce main que dans le cas d'un programme autonome

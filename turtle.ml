@@ -43,12 +43,13 @@ let create_turtle () =
 
 let calc_size (t:turtle) (c:command) (d:draw_size): (draw_size * turtle) =
 	match c with
-	| Line i -> (* Tester : si l'angle de la tortue dirige vers quel quart du plan ET si on "revient sur nos pas (on est avant le milieu de l'écran) ou si on avance vers la direction"*)
+	| Line i ->
 		moveto (int_of_float ( ((float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.x) )
 		 (int_of_float ( ((float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.y) );
+		 let (x, y) = current_point () in
 		 ({
-			ver = if float_of_int (current_x ()) > d.ver then float_of_int (current_x ()) else d.ver;
-			hor = if float_of_int (current_y ()) > d.hor then  float_of_int (current_y ()) else d.hor;
+			ver = if float_of_int (abs (y - 400)) > d.ver then float_of_int (abs (y - 400)) else d.ver;
+			hor = if float_of_int (abs (x - 400)) > d.hor then  float_of_int (abs (x- 400)) else d.hor;
   	   },{current_pos = {
   		  x = float_of_int (current_x ());
   		  y = float_of_int (current_y ());
@@ -66,15 +67,16 @@ let calc_size (t:turtle) (c:command) (d:draw_size): (draw_size * turtle) =
   		 a = t.current_pos.a};
   	   saved_pos = t.saved_pos})
 
-	| Turn i -> (* turn by i degrees *)
-	({
-		hor = d.hor;
-		ver = d.ver;
- },{current_pos = {
-	x = float_of_int (current_x ());
-	y = float_of_int (current_y ());
-	a = t.current_pos.a};
-  saved_pos = t.saved_pos})
+	   | Turn i -> (* turn by i degrees *)
+	   ({
+		 hor = d.hor;
+		 ver = d.ver;
+	},
+	      {current_pos = {
+	         x = t.current_pos.x;
+	         y = t.current_pos.y;
+	         a = mod_float ( t.current_pos.a +. (float_of_int i) ) 360.};
+	       saved_pos = t.saved_pos})
 
 	| Store -> (* save current_pos in saved_pos *)
 	({
