@@ -35,7 +35,7 @@ exception Restoration_failure of string;;
 let pi = 4.0 *. atan 1.0;;
 
 let create_turtle () =
-  moveto 400 0; (* move to middle bottom *)
+  moveto 400 400; (* move to middle bottom *)
   {current_pos = {
      x = float_of_int (current_x ());
      y = float_of_int (current_y ());
@@ -46,7 +46,7 @@ let create_turtle () =
 let calc_size (t:turtle) (c:command) (d:draw_size): (draw_size * turtle) =
 	match c with
 	| Line i -> (* Tester : si l'angle de la tortue dirige vers quel quart du plan ET si on "revient sur nos pas (on est avant le milieu de l'écran) ou si on avance vers la direction"*)
-	   if t.current_pos.a <= 90.0
+	   if t.current_pos.a <= 90.0 && t.current_pos.a >= 0. || t.current_pos.a < -270.
 	   then ({
 			nord = d.nord;
 			east = d.east +. float_of_int i;
@@ -57,7 +57,7 @@ let calc_size (t:turtle) (c:command) (d:draw_size): (draw_size * turtle) =
 		  y = float_of_int (current_y ());
 		  a = t.current_pos.a};
 		saved_pos = t.saved_pos})
-	   else if t.current_pos.a < 180.
+	   else if t.current_pos.a <= 180. && t.current_pos.a > 90. || t.current_pos.a < -180. && t.current_pos.a > 270.
 	   then ({
 			nord = d.nord +. float_of_int i;
 			east = d.east;
@@ -68,7 +68,7 @@ let calc_size (t:turtle) (c:command) (d:draw_size): (draw_size * turtle) =
 		  y = float_of_int (current_y ());
 		  a = t.current_pos.a};
 		saved_pos = t.saved_pos})
-		else if t.current_pos.a < 270.
+		else if t.current_pos.a <= 270. && t.current_pos.a > 180. || t.current_pos.a < -90. && t.current_pos.a > -180.
  	   then ({
  			nord = d.nord;
  			east = d.east;

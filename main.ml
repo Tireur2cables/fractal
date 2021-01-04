@@ -108,12 +108,12 @@ let main () =
   let turtle = (create_turtle ()) in
   let turtle2 = (create_turtle ()) in
   let dim = {nord = 0.;east=0.;south=0.;west=0.} in
-  let (draw, turtlef) = calc turtle system 7 dim in
+  let (draw, turtlef) = calc turtle system 10 dim in
   print_float draw.nord;
   print_float draw.east;
   print_float draw.south;
   print_float draw.west;
-  let turle_fin = rewrite turtle system 7 in
+  let turle_fin = rewrite turtle system 10 in
   close_after_event ()
 ;;
 (** On ne lance ce main que dans le cas d'un programme autonome
