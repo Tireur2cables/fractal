@@ -14,6 +14,13 @@ type position = {
     a: float;        (** angle of the direction *)
   }
 
+type draw_size = {
+	nord : float;        (** position nord *)
+	east : float;        (** position east *)
+	south: float;       (** position south *)
+	west: float;        (** position west *)
+};;
+
 type turtle = {
     current_pos: position;
     saved_pos: position list;
@@ -26,6 +33,11 @@ exception Restoration_failure of string
 val pi : float
 
 val create_turtle : unit -> turtle
+
+val calc_size : turtle -> command -> draw_size -> (draw_size * turtle)
+
+
+val calc_commands : turtle -> command list -> draw_size -> (draw_size * turtle)
 
 val exec_command : turtle -> command -> turtle
 

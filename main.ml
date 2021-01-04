@@ -47,6 +47,34 @@ let try_exec (t: turtle) (l: command list) : (turtle) =
      create_turtle ()
 ;;
 
+let rec calc_aux turtle system degre symbol curr_dim =
+  if degre = 0 then
+    calc_commands turtle (system.interp symbol) curr_dim
+  else
+	let rec fun_aux turtle curr_dim s =
+	  match s with
+	  | "" -> (curr_dim, turtle)
+	  | s ->
+         let sub = String.sub s 1 (String.length s - 1) in
+		 let (dimm, tort) = calc_aux turtle system (degre-1) (String.make 1 s.[0]) curr_dim in
+         fun_aux tort dimm sub
+	in
+    let res = string_of_word (system.rules symbol) in (* ATTENTION : mise en mémoire des itérations *)
+    fun_aux turtle curr_dim res
+;;
+
+let calc turtle system degre curr_dim =
+	let rec fun_aux turtle curr_dim s =
+		match s with
+		| "" -> (curr_dim, turtle)
+		| s ->
+           let sub = String.sub s 1 (String.length s - 1) in
+		   let (dimm, tort) = calc_aux turtle system degre (String.make 1 s.[0]) curr_dim in
+           fun_aux tort dimm sub
+	in
+	fun_aux turtle curr_dim (string_of_word system.axiom)
+;;
+
 let rec rewrite_aux turtle system degre symbol =
   if degre = 0 then
     exec_commands turtle (system.interp symbol)
@@ -76,8 +104,15 @@ let rewrite turtle system degre =
 let main () =
   Arg.parse cmdline_options extra_arg_action usage;
   open_window 800 800;
-  let system = interpret_file "./examples/br3.sys" in
+  let system = interpret_file "./examples/dragon.sys" in
   let turtle = (create_turtle ()) in
+  let turtle2 = (create_turtle ()) in
+  let dim = {nord = 0.;east=0.;south=0.;west=0.} in
+  let (draw, turtlef) = calc turtle system 7 dim in
+  print_float draw.nord;
+  print_float draw.east;
+  print_float draw.south;
+  print_float draw.west;
   let turle_fin = rewrite turtle system 7 in
   close_after_event ()
 ;;
