@@ -47,8 +47,8 @@ let calc_size (t:turtle) (c:command) (d:draw_size): (draw_size * turtle) =
 		moveto (int_of_float ( ((float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.x) )
 		 (int_of_float ( ((float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.y) );
 		 ({
-			ver = if current_x () > d.ver then current_x () else d.ver;
-			hor = if current_x () > d.hor then current_x () else d.hor;
+			ver = if float_of_int (current_x ()) > d.ver then float_of_int (current_x ()) else d.ver;
+			hor = if float_of_int (current_y ()) > d.hor then  float_of_int (current_y ()) else d.hor;
   	   },{current_pos = {
   		  x = float_of_int (current_x ());
   		  y = float_of_int (current_y ());
@@ -59,7 +59,7 @@ let calc_size (t:turtle) (c:command) (d:draw_size): (draw_size * turtle) =
 		 (int_of_float ( ((float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.y) );
 		 ({
 		   hor = d.hor;
-		   ver = d.cur_vert;
+		   ver = d.ver;
   	  },{current_pos = {
   		 x = float_of_int (current_x ());
   		 y = float_of_int (current_y ());
@@ -68,8 +68,8 @@ let calc_size (t:turtle) (c:command) (d:draw_size): (draw_size * turtle) =
 
 	| Turn i -> (* turn by i degrees *)
 	({
-	  hor = d.hor;
-	  ver = d.cur_vert;
+		hor = d.hor;
+		ver = d.ver;
  },{current_pos = {
 	x = float_of_int (current_x ());
 	y = float_of_int (current_y ());
@@ -78,8 +78,8 @@ let calc_size (t:turtle) (c:command) (d:draw_size): (draw_size * turtle) =
 
 	| Store -> (* save current_pos in saved_pos *)
 	({
-	  hor = d.hor;
-	  ver = d.cur_vert;
+		hor = d.hor;
+		ver = d.ver;
  },{current_pos = {
 	x = float_of_int (current_x ());
 	y = float_of_int (current_y ());
@@ -92,8 +92,8 @@ let calc_size (t:turtle) (c:command) (d:draw_size): (draw_size * turtle) =
 	   | s :: l ->
 		  begin
 		  ({
- 		   hor = d.hor;
- 		   ver = d.cur_vert;
+			  hor = d.hor;
+   		   ver = d.ver;
    	  },{current_pos = {
    		 x = float_of_int (current_x ());
    		 y = float_of_int (current_y ());
