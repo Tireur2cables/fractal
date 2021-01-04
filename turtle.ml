@@ -15,12 +15,6 @@ type position = {
     a: float;        (** angle of the direction *)
   };;
 
-  (** Size of the drawing*)
-type draw_size = {
-  ver : float;
-  hor : float;
-};;
-
 type turtle = {
     current_pos: position;
     saved_pos: position list;
@@ -41,16 +35,15 @@ let create_turtle () =
   saved_pos = []} (* No saved postion *)
 ;;
 
-let calc_size (t:turtle) (c:command) (d:draw_size): (draw_size * turtle) =
+let calc_size (t:turtle) (c:command) ((ver, hor) : (float * float)) : (float * float * turtle) =
 	match c with
 	| Line i ->
 		moveto (int_of_float ( ((float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.x) )
 		 (int_of_float ( ((float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.y) );
 		 let (x, y) = current_point () in
-		 ({
-			ver = if float_of_int (abs (y - 400)) > d.ver then float_of_int (abs (y - 400)) else d.ver;
-			hor = if float_of_int (abs (x - 400)) > d.hor then  float_of_int (abs (x- 400)) else d.hor;
-  	   },{current_pos = {
+		 let v = if float_of_int (abs (y - 400)) > ver then float_of_int (abs (y - 400)) else ver in
+		 let h = if float_of_int (abs (x - 400)) > hor then  float_of_int (abs (x- 400)) else hor in
+		 (h,v, {current_pos = {
   		  x = float_of_int (current_x ());
   		  y = float_of_int (current_y ());
   		  a = t.current_pos.a};
@@ -58,20 +51,17 @@ let calc_size (t:turtle) (c:command) (d:draw_size): (draw_size * turtle) =
 	| Move i -> (* move without drawing by i pixels *)
 	   moveto (int_of_float ( ((float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.x) )
 		 (int_of_float ( ((float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.y) );
-		 ({
-		   hor = d.hor;
-		   ver = d.ver;
-  	  },{current_pos = {
+		 (
+		   hor, ver,{current_pos = {
   		 x = float_of_int (current_x ());
   		 y = float_of_int (current_y ());
   		 a = t.current_pos.a};
   	   saved_pos = t.saved_pos})
 
 	   | Turn i -> (* turn by i degrees *)
-	   ({
-		 hor = d.hor;
-		 ver = d.ver;
-	},
+	   (
+		 hor,
+		 ver,
 	      {current_pos = {
 	         x = t.current_pos.x;
 	         y = t.current_pos.y;
@@ -79,36 +69,27 @@ let calc_size (t:turtle) (c:command) (d:draw_size): (draw_size * turtle) =
 	       saved_pos = t.saved_pos})
 
 	| Store -> (* save current_pos in saved_pos *)
-	({
-		hor = d.hor;
-		ver = d.ver;
- },{current_pos = {
+	(hor,ver, {current_pos = {
 	x = float_of_int (current_x ());
 	y = float_of_int (current_y ());
 	a = t.current_pos.a};
-  saved_pos = t.saved_pos})
+  saved_pos = t.current_pos :: t.saved_pos})
 
 	| Restore -> (* put saved_pos in current_pos if possible *)
 	   match t.saved_pos with
 	   | [] -> raise (Restoration_failure "Erreur de Restoration -> Aucune position sauvegardée!\n")
 	   | s :: l ->
 		  begin
-		  ({
-			  hor = d.hor;
-   		   ver = d.ver;
-   	  },{current_pos = {
-   		 x = float_of_int (current_x ());
-   		 y = float_of_int (current_y ());
-   		 a = t.current_pos.a};
-   	   saved_pos = t.saved_pos})
+		  (hor,ver,{current_pos = s;
+		  saved_pos = l})
 		  end
 
-let exec_command (t: turtle) (c: command) : (turtle) =
+let exec_command (t: turtle) (c: command) ((x,y) : (float * float)): (turtle) =
   match c with
 
   | Line i -> (* move while drawing by i pixels *)
-     lineto (int_of_float ( ((float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.x) )
-       (int_of_float ( ((float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.y) );
+     lineto (int_of_float (x *.((float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.x) )
+       (int_of_float (x *. ((float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.y) );
      {current_pos = {
         x = float_of_int (current_x ());
         y = float_of_int (current_y ());
@@ -146,17 +127,17 @@ let exec_command (t: turtle) (c: command) : (turtle) =
         end
 ;;
 
-let rec calc_commands (t:turtle) (l:command list) (d:draw_size): (draw_size * turtle) =
+let rec calc_commands (t:turtle) (l:command list) (h,v): (float * float * turtle) =
   match l with
-  | [] -> (d,t)
+  | [] -> (h,v,t)
   | x :: l -> (
-	  let (dim, tort) = calc_size t x d in
-	  calc_commands tort l dim
+	  let (h,v, tort) = calc_size t x (h,v) in
+	  calc_commands tort l (h,v)
 	  )
 ;;
 
-let rec exec_commands (t: turtle) (l: command list) : turtle =
+let rec exec_commands (t: turtle) (l: command list) ((h,v) : (float * float)): turtle =
   match l with
   | [] -> t
-  | x :: l -> exec_commands (exec_command t x) l
+  | x :: l -> exec_commands (exec_command t x (h,v)) l (h,v)
 ;;
