@@ -107,12 +107,10 @@ let main () =
   let system = interpret_file "./examples/dragon.sys" in
   let turtle = (create_turtle ()) in
   let turtle2 = (create_turtle ()) in
-  let dim = {cur_vert = 0.; cur_hor = 0.; nord = 0.;east=0.;south=0.;west=0.} in
+  let dim = {ver = 0.; hor = 0.;} in
   let (draw, turtlef) = calc turtle system 10 dim in
-  print_float draw.nord;
-  print_float draw.east;
-  print_float draw.south;
-  print_float draw.west;
+  print_float draw.hor;
+  print_float draw.ver;
   let turle_fin = rewrite turtle system 10 in
   close_after_event ()
 ;;
