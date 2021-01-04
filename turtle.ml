@@ -17,6 +17,8 @@ type position = {
 
   (** Size of the drawing*)
 type draw_size = {
+  cur_vert : float;
+  cur_hor : float;
   nord : float;        (** position nord *)
   east : float;        (** position east *)
   south: float;       (** position south *)
@@ -48,10 +50,12 @@ let calc_size (t:turtle) (c:command) (d:draw_size): (draw_size * turtle) =
 	| Line i -> (* Tester : si l'angle de la tortue dirige vers quel quart du plan ET si on "revient sur nos pas (on est avant le milieu de l'écran) ou si on avance vers la direction"*)
 	   if t.current_pos.a <= 90.0 && t.current_pos.a >= 0. || t.current_pos.a < -270.
 	   then ({
-			nord = d.nord;
-			east = d.east +. float_of_int i;
-			south = d.south;
-			west = d.west;
+		   	cur_vert = d.cur_vert +. float_of_int i;
+			cur_hor = d.cur_hor +. float_of_int i;
+			nord = if d.cur_vert > d.nord then d.cur_vert else d.nord;
+			east = if d.cur_hor > d.east then d.cur_hor else d.east;
+			south =if d.cur_vert < d.south then d.cur_vert else d.south;
+			west = if d.cur_hor < d.west then d.cur_hor else d.west;
 	   },{current_pos = {
 		  x = float_of_int (current_x ());
 		  y = float_of_int (current_y ());
@@ -59,10 +63,12 @@ let calc_size (t:turtle) (c:command) (d:draw_size): (draw_size * turtle) =
 		saved_pos = t.saved_pos})
 	   else if t.current_pos.a <= 180. && t.current_pos.a > 90. || t.current_pos.a < -180. && t.current_pos.a > 270.
 	   then ({
-			nord = d.nord +. float_of_int i;
-			east = d.east;
-			south = d.south;
-			west = d.west;
+		   cur_vert = d.cur_vert +. float_of_int i;
+		   cur_hor = d.cur_hor -. float_of_int i;
+		   nord = if d.cur_vert > d.nord then d.cur_vert else d.nord;
+		   east = if d.cur_hor > d.east then d.cur_hor else d.east;
+		   south =if d.cur_vert < d.south then d.cur_vert else d.south;
+		   west = if d.cur_hor < d.west then d.cur_hor else d.west;
 	   },{current_pos = {
 		  x = float_of_int (current_x ());
 		  y = float_of_int (current_y ());
@@ -70,20 +76,24 @@ let calc_size (t:turtle) (c:command) (d:draw_size): (draw_size * turtle) =
 		saved_pos = t.saved_pos})
 		else if t.current_pos.a <= 270. && t.current_pos.a > 180. || t.current_pos.a < -90. && t.current_pos.a > -180.
  	   then ({
- 			nord = d.nord;
- 			east = d.east;
- 			south = d.south;
- 			west = d.west  +. float_of_int i;
+		   cur_vert = d.cur_vert -. float_of_int i;
+		   cur_hor = d.cur_hor -. float_of_int i;
+		   nord = if d.cur_vert > d.nord then d.cur_vert else d.nord;
+		   east = if d.cur_hor > d.east then d.cur_hor else d.east;
+		   south =if d.cur_vert < d.south then d.cur_vert else d.south;
+		   west = if d.cur_hor < d.west then d.cur_hor else d.west;
  	   },{current_pos = {
  		  x = float_of_int (current_x ());
  		  y = float_of_int (current_y ());
  		  a = t.current_pos.a};
  		saved_pos = t.saved_pos})
  		else ( {
-  			nord = d.nord;
-  			east = d.east;
-  			south = d.south  +. float_of_int i;
-  			west = d.west;
+			cur_vert = d.cur_vert -. float_of_int i;
+			cur_hor = d.cur_hor +. float_of_int i;
+			nord = if d.cur_vert > d.nord then d.cur_vert else d.nord;
+			east = if d.cur_hor > d.east then d.cur_hor else d.east;
+			south =if d.cur_vert < d.south then d.cur_vert else d.south;
+			west = if d.cur_hor < d.west then d.cur_hor else d.west;
   	   },{current_pos = {
   		  x = float_of_int (current_x ());
   		  y = float_of_int (current_y ());
@@ -93,6 +103,8 @@ let calc_size (t:turtle) (c:command) (d:draw_size): (draw_size * turtle) =
 	   moveto (int_of_float ( ((float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.x) )
 		 (int_of_float ( ((float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.y) );
 		 ({
+		   cur_hor = d.cur_hor;
+		   cur_vert = d.cur_vert;
   		   nord = d.nord;
   		   east = d.east;
   		   south = d.south;
@@ -105,6 +117,8 @@ let calc_size (t:turtle) (c:command) (d:draw_size): (draw_size * turtle) =
 
 	| Turn i -> (* turn by i degrees *)
 	({
+		cur_hor = d.cur_hor;
+		cur_vert = d.cur_vert;
 		nord = d.nord;
 		east = d.east;
 		south = d.south;
@@ -117,6 +131,8 @@ let calc_size (t:turtle) (c:command) (d:draw_size): (draw_size * turtle) =
 
 	| Store -> (* save current_pos in saved_pos *)
 	({
+		cur_hor = d.cur_hor;
+		cur_vert = d.cur_vert;
 		nord = d.nord;
 		east = d.east;
 		south = d.south;
@@ -134,6 +150,8 @@ let calc_size (t:turtle) (c:command) (d:draw_size): (draw_size * turtle) =
 		  begin
 			moveto (int_of_float s.x) (int_of_float s.y);
 			({
+				cur_hor = d.cur_hor;
+	 			cur_vert = d.cur_vert;
 	 			nord = d.nord;
 	 			east = d.east;
 	 			south = d.south;

@@ -15,6 +15,8 @@ type position = {
   }
 
 type draw_size = {
+	cur_vert : float;
+	cur_hor : float;
 	nord : float;        (** position nord *)
 	east : float;        (** position east *)
 	south: float;       (** position south *)

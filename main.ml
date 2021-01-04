@@ -107,7 +107,7 @@ let main () =
   let system = interpret_file "./examples/dragon.sys" in
   let turtle = (create_turtle ()) in
   let turtle2 = (create_turtle ()) in
-  let dim = {nord = 0.;east=0.;south=0.;west=0.} in
+  let dim = {cur_vert = 0.; cur_hor = 0.; nord = 0.;east=0.;south=0.;west=0.} in
   let (draw, turtlef) = calc turtle system 10 dim in
   print_float draw.nord;
   print_float draw.east;
