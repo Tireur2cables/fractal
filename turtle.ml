@@ -48,9 +48,9 @@ let create_turtle () =
 let calc_size (t:turtle) (c:command) (d:draw_size): (draw_size * turtle) =
 	match c with
 	| Line i -> (* Tester : si l'angle de la tortue dirige vers quel quart du plan ET si on "revient sur nos pas (on est avant le milieu de l'écran) ou si on avance vers la direction"*)
-	   if t.current_pos.a <= 90.0 && t.current_pos.a >= 0. || t.current_pos.a < -270.
+	   if t.current_pos.a = 0.0 || t.current_pos.a = 360. (*&& t.current_pos.a >= 0. || t.current_pos.a < -270.*)
 	   then ({
-		   	cur_vert = d.cur_vert +. float_of_int i;
+		   	cur_vert = d.cur_vert;
 			cur_hor = d.cur_hor +. float_of_int i;
 			nord = if d.cur_vert > d.nord then d.cur_vert else d.nord;
 			east = if d.cur_hor > d.east then d.cur_hor else d.east;
@@ -61,7 +61,7 @@ let calc_size (t:turtle) (c:command) (d:draw_size): (draw_size * turtle) =
 		  y = float_of_int (current_y ());
 		  a = t.current_pos.a};
 		saved_pos = t.saved_pos})
-	   else if t.current_pos.a <= 180. && t.current_pos.a > 90. || t.current_pos.a < -180. && t.current_pos.a > 270.
+	   else if t.current_pos.a = 90. || t.current_pos.a = -270. (*&& t.current_pos.a > 90. || t.current_pos.a < -180. && t.current_pos.a > 270.*)
 	   then ({
 		   cur_vert = d.cur_vert +. float_of_int i;
 		   cur_hor = d.cur_hor -. float_of_int i;
@@ -74,7 +74,7 @@ let calc_size (t:turtle) (c:command) (d:draw_size): (draw_size * turtle) =
 		  y = float_of_int (current_y ());
 		  a = t.current_pos.a};
 		saved_pos = t.saved_pos})
-		else if t.current_pos.a <= 270. && t.current_pos.a > 180. || t.current_pos.a < -90. && t.current_pos.a > -180.
+		else if t.current_pos.a = 180. || t.current_pos.a = -180. (*&& t.current_pos.a > 180. || t.current_pos.a < -90. && t.current_pos.a > -180.*)
  	   then ({
 		   cur_vert = d.cur_vert -. float_of_int i;
 		   cur_hor = d.cur_hor -. float_of_int i;
