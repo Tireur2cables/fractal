@@ -110,8 +110,9 @@ let main () =
   print_float (x);
   print_string "\n";
   print_float (y);
+  let z = min x y in
   let turtle = (create_turtle ()) in
-  let turle_fin = rewrite turtle system 4 (800./.x,800./.y) in
+  let turle_fin = rewrite turtle system 4 (400./.z,400./.z) in
   close_after_event ()
 ;;
 (** On ne lance ce main que dans le cas d'un programme autonome
