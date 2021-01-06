@@ -27,7 +27,7 @@ exception Restoration_failure of string;;
 let pi = 4.0 *. atan 1.0;;
 
 let create_turtle () =
-  moveto 400 400; (* move to middle bottom *)
+  moveto 400 0; (* move to middle bottom *)
   {current_pos = {
      x = float_of_int (current_x ());
      y = float_of_int (current_y ());
@@ -35,61 +35,74 @@ let create_turtle () =
   saved_pos = []} (* No saved postion *)
 ;;
 
-let calc_size (t:turtle) (c:command) ((ver, hor) : (float * float)) : (float * float * turtle) =
+let calc_size t c (hp, vp, hn, vn) =
 	match c with
 	| Line i ->
-		moveto (int_of_float ( ((float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.x) )
-		 (int_of_float ( ((float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.y) );
-		 let (x, y) = current_point () in
-		 let v = if float_of_int (abs (y - 400)) > ver then float_of_int (abs (y - 400)) else ver in
-		 let h = if float_of_int (abs (x - 400)) > hor then  float_of_int (abs (x- 400)) else hor in
-		 (h,v, {current_pos = {
-  		  x = float_of_int (current_x ());
-  		  y = float_of_int (current_y ());
-  		  a = t.current_pos.a};
-		  saved_pos = t.saved_pos})
-	| Move i -> (* move without drawing by i pixels *)
-	   moveto (int_of_float ( ((float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.x) )
-		 (int_of_float ( ((float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.y) );
-		 (
-		   hor, ver,{current_pos = {
-  		 x = float_of_int (current_x ());
-  		 y = float_of_int (current_y ());
-  		 a = t.current_pos.a};
-  	   saved_pos = t.saved_pos})
-
-	   | Turn i -> (* turn by i degrees *)
-	   (
-		 hor,
-		 ver,
-	      {current_pos = {
-	         x = t.current_pos.x;
-	         y = t.current_pos.y;
-	         a = mod_float ( t.current_pos.a +. (float_of_int i) ) 360.};
-	       saved_pos = t.saved_pos})
+       let newx = int_of_float (((float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.x) in
+       let newy = int_of_float (((float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.y) in
+       let flx = ((float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi))) /. (float_of_int i) in
+       let fly = ((float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi))) /. (float_of_int i) in
+       let hp = if flx > 0. then hp +. flx else hp in
+       let vp = if fly > 0. then vp +. fly else vp in
+       let hn = if flx < 0. then hn +. flx else hn in
+       let vn = if fly < 0. then vn +. fly else vn in
+       (hp, vp, hn, vn, {
+            current_pos = {
+  		      x = float_of_int newx;
+  		      y = float_of_int newy;
+  		      a = t.current_pos.a};
+            saved_pos = t.saved_pos})
+	| Move i ->
+       let newx = int_of_float (((float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.x) in
+       let newy = int_of_float (((float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.y) in
+       let flx = ((float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi))) /. (float_of_int i) in
+       let fly = ((float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi))) /. (float_of_int i) in
+       let hp = if flx > 0. then hp +. flx else hp in
+       let vp = if fly > 0. then vp +. fly else vp in
+       let hn = if flx < 0. then hn +. flx else hn in
+       let vn = if fly < 0. then vn +. fly else vn in
+       (hp, vp, hn, vn, {
+            current_pos = {
+  		      x = float_of_int newx;
+  		      y = float_of_int newy;
+  		      a = t.current_pos.a};
+            saved_pos = t.saved_pos})
+	| Turn i -> (* turn by i degrees *)
+	   (hp, vp, hn, vn, {
+            current_pos = {
+	          x = t.current_pos.x;
+	          y = t.current_pos.y;
+	          a = mod_float ( t.current_pos.a +. (float_of_int i) ) 360.};
+	        saved_pos = t.saved_pos})
 
 	| Store -> (* save current_pos in saved_pos *)
-	(hor,ver, {current_pos = {
-	x = float_of_int (current_x ());
-	y = float_of_int (current_y ());
-	a = t.current_pos.a};
-  saved_pos = t.current_pos :: t.saved_pos})
+	   (hp, vp, hn, vn, {
+            current_pos = {
+	          x = t.current_pos.x;
+	          y = t.current_pos.y;
+	          a = t.current_pos.a};
+            saved_pos = t.current_pos :: t.saved_pos})
 
 	| Restore -> (* put saved_pos in current_pos if possible *)
 	   match t.saved_pos with
 	   | [] -> raise (Restoration_failure "Erreur de Restoration -> Aucune position sauvegardée!\n")
 	   | s :: l ->
 		  begin
-		  (hor,ver,{current_pos = s;
-		  saved_pos = l})
+		    (hp, vp, hn, vn, {
+                 current_pos = s;
+		         saved_pos = l})
 		  end
+;;
 
-let exec_command (t: turtle) (c: command) ((x,y) : (float * float)): (turtle) =
+let exec_command (t: turtle) (c: command) ((coefx, coefy) : (float * float)): (turtle) =
   match c with
 
   | Line i -> (* move while drawing by i pixels *)
-     lineto (max ((int_of_float (((float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.x))) 1)
-       (max ((int_of_float (((float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.y))) 1);
+     let newx = int_of_float
+                  (((coefx *. (float_of_int i)) *. (cos ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.x) in
+     let newy = int_of_float
+                  (((coefy *. (float_of_int i)) *. (sin ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.y) in
+     lineto newx newy;
      {current_pos = {
         x = float_of_int (current_x ());
         y = float_of_int (current_y ());
@@ -97,8 +110,11 @@ let exec_command (t: turtle) (c: command) ((x,y) : (float * float)): (turtle) =
       saved_pos = t.saved_pos}
 
   | Move i -> (* move without drawing by i pixels *)
-     moveto (int_of_float ( ((float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.x) )
-       (int_of_float ( ((float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.y) );
+     let newx = int_of_float
+                  (((coefx *. (float_of_int i)) *. (cos ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.x) in
+     let newy = int_of_float
+                  (((coefy *. (float_of_int i)) *. (sin ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.y) in
+     moveto newx newy;
      {current_pos = {
         x = float_of_int (current_x ());
         y = float_of_int (current_y ());
@@ -127,17 +143,18 @@ let exec_command (t: turtle) (c: command) ((x,y) : (float * float)): (turtle) =
         end
 ;;
 
-let rec calc_commands (t:turtle) (l:command list) (h,v): (float * float * turtle) =
+let rec calc_commands (t:turtle) (l:command list) (hp, vp, hn, vn) =
   match l with
-  | [] -> (h,v,t)
-  | x :: l -> (
-	  let (h,v, tort) = calc_size t x (h,v) in
-	  calc_commands tort l (h,v)
-	  )
+  | [] -> (hp, vp, hn, vn, t)
+  | x :: l ->
+     begin
+	   let (hp, vp, hn, vn, tort) = calc_size t x (hp, vp, hn, vn) in
+	   calc_commands tort l (hp, vp, hn, vn)
+	 end
 ;;
 
-let rec exec_commands (t: turtle) (l: command list) ((h,v) : (float * float)): turtle =
+let rec exec_commands (t: turtle) (l: command list) ((coefx, coefy) : (float * float)): turtle =
   match l with
   | [] -> t
-  | x :: l -> exec_commands (exec_command t x (h,v)) l (h,v)
+  | x :: l -> exec_commands (exec_command t x (coefx, coefy)) l (coefx, coefy)
 ;;

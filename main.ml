@@ -47,20 +47,20 @@ let try_exec (t: turtle) (l: command list) draw: (turtle) =
      create_turtle ()
 ;;
 
-let rec calc_aux turtle system degre symbol (h,v) =
+let rec calc_aux turtle system degre symbol (hp, vp, hn, vn) =
   if degre = 0 then
-    calc_commands turtle (system.interp symbol) (h,v)
+    calc_commands turtle (system.interp symbol) (hp, vp, hn, vn)
   else
-	let rec fun_aux turtle (h,v) s =
+	let rec fun_aux turtle (hp, vp, hn, vn) s =
 	  match s with
-	  | "" -> (h,v, turtle)
+	  | "" -> (hp, vp, hn, vn, turtle)
 	  | s ->
          let sub = String.sub s 1 (String.length s - 1) in
-		 let (x , y, tort) = calc_aux turtle system (degre-1) (String.make 1 s.[0]) (h,v) in
-         fun_aux tort (x,y) sub
+		 let (xmax, ymax, xmin, ymin, tort) = calc_aux turtle system (degre-1) (String.make 1 s.[0]) (hp, vp, hn, vn) in
+         fun_aux tort (xmax, ymax, xmin, ymin) sub
 	in
-    let res = string_of_word (system.rules symbol) in (* ATTENTION : mise en mémoire des itérations *)
-    fun_aux turtle (h,v) res
+    let res = string_of_word (system.rules symbol) in
+    fun_aux turtle (hp, vp, hn, vn) res
 ;;
 
 let calc turtle system degre curr_dim =
@@ -69,8 +69,8 @@ let calc turtle system degre curr_dim =
 		| "" -> (curr_dim, turtle)
 		| s ->
            let sub = String.sub s 1 (String.length s - 1) in
-		   let (x,y, tort) = calc_aux turtle system degre (String.make 1 s.[0]) curr_dim in
-           fun_aux tort (x,y) sub
+		   let (xmax, ymax, xmin, ymin, tort) = calc_aux turtle system degre (String.make 1 s.[0]) curr_dim in
+           fun_aux tort (xmax, ymax, xmin, ymin) sub
 	in
 	fun_aux turtle curr_dim (string_of_word system.axiom)
 ;;
@@ -86,7 +86,7 @@ let rec rewrite_aux turtle system degre symbol draw =
          let sub = String.sub s 1 (String.length s - 1) in
          fun_aux (rewrite_aux turtle system (degre-1) (String.make 1 s.[0]) draw) sub
 	in
-    let res = string_of_word (system.rules symbol) in (* ATTENTION : mise en mémoire des itérations *)
+    let res = string_of_word (system.rules symbol) in
     fun_aux turtle res
 ;;
 
@@ -101,17 +101,28 @@ let rewrite turtle system degre draw =
 	fun_aux turtle (string_of_word system.axiom)
 ;;
 
+let round_millieme f = (floor (f *. 1000.)) /. 1000. ;;
+
 let main () =
   Arg.parse cmdline_options extra_arg_action usage;
-  open_window 1000 1000;
-  let system = interpret_file "./examples/snow.sys" in
-  let turtle2 = (create_turtle ()) in
-  let ((x,y), turtlef) = calc turtle2 system 4 (0.,0.) in
-  print_float (x);
-  print_string "\n";
-  print_float (y);
-  let turtle = (create_turtle ()) in
-  let turle_fin = rewrite turtle system 4 (800./.x,800./.y) in
+  let taillex = 800 in
+  let tailley = 800 in
+  open_window taillex tailley;
+  let degre = 7 in
+  let system = interpret_file "./examples/br3.sys" in
+  let turtle = create_turtle () in
+  let ((xmax, ymax, xmin, ymin), turtlef) = calc turtle system degre (0., 0., 0., 0.) in
+  let xmin = if (round_millieme xmin) <> 0. then (float_of_int taillex) /. xmin else 0. in
+  let xmin = if xmin > 0. then xmin else (0. -. xmin) in
+  let xmax = if (round_millieme xmax) <> 0. then (float_of_int taillex) /. xmax else 0. in
+  let coefx = if xmax = 0. then xmin else if xmin = 0. then xmax else min xmin xmax in
+  let ymin = if (round_millieme ymin) <> 0. then (float_of_int tailley) /. ymin else 0. in
+  let ymin = if ymin > 0. then ymin else (0. -. ymin) in
+  let ymax = if (round_millieme ymax) <> 0. then (float_of_int tailley) /. ymax else 0. in
+  let coefy = if ymax = 0. then ymin else if ymin = 0. then ymax else min ymax ymin in
+  let turtle = create_turtle () in
+  print_float coefx; print_string "\n"; print_float coefy; print_string "\n";
+  let turle_fin = rewrite turtle system degre (coefx, coefy) in
   close_after_event ()
 ;;
 (** On ne lance ce main que dans le cas d'un programme autonome
