@@ -60,11 +60,11 @@ let rewrite turtle system degre =
 	fun_aux turtle (string_of_word system.axiom)
 ;;
 
-let start file =
+let start file nb =
 	open_window 800 800;
 	let system = interpret_file file in
 	let turtle = (create_turtle ()) in
-	let turle_fin = rewrite turtle system 7 in
+	let turle_fin = rewrite turtle system nb in
 	close_after_event ()
 ;;
 
@@ -75,8 +75,10 @@ let action_what () =
 
 let action_file () =
   if Array.length Sys.argv = 2
-  then start "./examples/br3.sys"
-  else start Sys.argv.(2);
+  then start "./examples/br3.sys" 7
+  else if Array.length Sys.argv  = 3
+  then start Sys.argv.(2) 7
+  else start Sys.argv.(2) (int_of_string Sys.argv.(3));
   exit 0
 ;;
 
@@ -91,7 +93,7 @@ let extra_arg_action = fun s -> failwith ("Argument inconnu :"^s);;
 
 let main () =
   Arg.parse cmdline_options extra_arg_action usage;
-  start "./examples/br3.sys"
+  start "./examples/br3.sys" 7
 ;;
 (** On ne lance ce main que dans le cas d'un programme autonome
     (c'est-à-dire que l'on est pas dans un "toplevel" ocaml interactif).
