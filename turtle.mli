@@ -32,6 +32,6 @@ val calc_size : turtle -> command -> (float * float * float * float) -> (float *
 
 val calc_commands : turtle -> command list -> (float * float * float * float) -> (float * float * float * float * turtle)
 
-val exec_command : turtle -> command -> (float * float) -> turtle
+val exec_command : turtle -> command -> (float * float) -> (float * float) -> turtle
 
-val exec_commands : turtle -> command list -> (float * float) -> turtle
+val exec_commands : turtle -> command list -> (float * float) -> (float * float) -> turtle

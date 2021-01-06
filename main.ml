@@ -38,9 +38,9 @@ let close_after_event () =
     Graphic_failure s -> exit 0
 ;;
 
-let try_exec (t: turtle) (l: command list) draw: (turtle) =
+let try_exec (t: turtle) (l: command list) draw (maxx, maxy): (turtle) =
   try
-    exec_commands t l draw
+    exec_commands t l draw (maxx, maxy)
   with
   | Restoration_failure s ->
      print_string s;
@@ -75,40 +75,39 @@ let calc turtle system degre curr_dim =
 	fun_aux turtle curr_dim (string_of_word system.axiom)
 ;;
 
-let rec rewrite_aux turtle system degre symbol draw =
+let rec rewrite_aux turtle system degre symbol draw (maxx, maxy) =
   if degre = 0 then
-    exec_commands turtle (system.interp symbol) draw
+    exec_commands turtle (system.interp symbol) draw (maxx, maxy)
   else
-	let rec fun_aux turtle s =
+	let rec fun_aux turtle s (maxx, maxy) =
 	  match s with
 	  | "" -> turtle
 	  | s ->
          let sub = String.sub s 1 (String.length s - 1) in
-         fun_aux (rewrite_aux turtle system (degre-1) (String.make 1 s.[0]) draw) sub
+         fun_aux (rewrite_aux turtle system (degre-1) (String.make 1 s.[0]) draw (maxx, maxy)) sub (maxx, maxy)
 	in
     let res = string_of_word (system.rules symbol) in
-    fun_aux turtle res
+    fun_aux turtle res (maxx, maxy)
 ;;
 
-let rewrite turtle system degre draw =
-	let rec fun_aux turtle s =
+let rewrite turtle system degre draw (maxx, maxy) =
+	let rec fun_aux turtle s (maxx, maxy) =
 		match s with
 		| "" -> turtle
 		| s ->
            let sub = String.sub s 1 (String.length s - 1) in
-           fun_aux (rewrite_aux turtle system degre (String.make 1 s.[0]) draw) sub
+           fun_aux (rewrite_aux turtle system degre (String.make 1 s.[0]) draw (maxx, maxy)) sub (maxx, maxy)
 	in
-	fun_aux turtle (string_of_word system.axiom)
+	fun_aux turtle (string_of_word system.axiom) (maxx, maxy)
 ;;
 
-let round_millieme f = (floor (f *. 1000.)) /. 1000. ;;
+let round_millieme f = (floor (f *. 100.)) /. 100. ;;
 
 let main () =
   Arg.parse cmdline_options extra_arg_action usage;
-  let taillex = 800 in
-  let tailley = 800 in
-  open_window taillex tailley;
-  let degre = 7 in
+  let taillex = 1500 in
+  let tailley = 900 in
+  let degre = 10 in
   let system = interpret_file "./examples/br3.sys" in
   let turtle = create_turtle () in
   let ((xmax, ymax, xmin, ymin), turtlef) = calc turtle system degre (0., 0., 0., 0.) in
@@ -121,8 +120,10 @@ let main () =
   let ymax = if (round_millieme ymax) <> 0. then (float_of_int tailley) /. ymax else 0. in
   let coefy = if ymax = 0. then ymin else if ymin = 0. then ymax else min ymax ymin in
   let turtle = create_turtle () in
+  if (round_millieme coefx) = 0. || (round_millieme coefy) < 0. then failwith "impossible de dessiner un si grand dessin sur si peu de pixels!";
   print_float coefx; print_string "\n"; print_float coefy; print_string "\n";
-  let turle_fin = rewrite turtle system degre (coefx, coefy) in
+  open_window taillex tailley;
+  let turle_fin = rewrite turtle system degre (coefx, coefy) (float_of_int taillex, float_of_int tailley) in
   close_after_event ()
 ;;
 (** On ne lance ce main que dans le cas d'un programme autonome

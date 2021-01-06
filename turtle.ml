@@ -27,7 +27,7 @@ exception Restoration_failure of string;;
 let pi = 4.0 *. atan 1.0;;
 
 let create_turtle () =
-  moveto 400 0; (* move to middle bottom *)
+  moveto 750 0; (* move to middle bottom *)
   {current_pos = {
      x = float_of_int (current_x ());
      y = float_of_int (current_y ());
@@ -94,14 +94,20 @@ let calc_size t c (hp, vp, hn, vn) =
 		  end
 ;;
 
-let exec_command (t: turtle) (c: command) ((coefx, coefy) : (float * float)): (turtle) =
+let exec_command (t: turtle) (c: command) (coefx, coefy) (maxx, maxy): (turtle) =
   match c with
 
   | Line i -> (* move while drawing by i pixels *)
-     let newx = int_of_float
-                  (((coefx *. (float_of_int i)) *. (cos ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.x) in
+	 let coefx = max (coefx *. (float_of_int i)) 1. in
+	 let newx = int_of_float
+                  ((coefx *. (cos ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.x) in
+     let newx = max newx 0 in
+     let newx = min newx (int_of_float maxx) in
+     let coefy = max (coefy *. (float_of_int i)) 1. in
      let newy = int_of_float
-                  (((coefy *. (float_of_int i)) *. (sin ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.y) in
+                  ((coefy *. (sin ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.y) in
+     let newy = max newy 0 in
+     let newy = min newy (int_of_float maxy) in
      lineto newx newy;
      {current_pos = {
         x = float_of_int (current_x ());
@@ -110,10 +116,16 @@ let exec_command (t: turtle) (c: command) ((coefx, coefy) : (float * float)): (t
       saved_pos = t.saved_pos}
 
   | Move i -> (* move without drawing by i pixels *)
-     let newx = int_of_float
-                  (((coefx *. (float_of_int i)) *. (cos ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.x) in
+     let coefx = max (coefx *. (float_of_int i)) 1. in
+	 let newx = int_of_float
+                  ((coefx *. (cos ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.x) in
+     let newx = max newx 0 in
+     let newx = min newx (int_of_float maxx) in
+     let coefy = max (coefy *. (float_of_int i)) 1. in
      let newy = int_of_float
-                  (((coefy *. (float_of_int i)) *. (sin ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.y) in
+                  ((coefy *. (sin ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.y) in
+     let newy = max newy 0 in
+     let newy = min newy (int_of_float maxy) in
      moveto newx newy;
      {current_pos = {
         x = float_of_int (current_x ());
@@ -153,8 +165,8 @@ let rec calc_commands (t:turtle) (l:command list) (hp, vp, hn, vn) =
 	 end
 ;;
 
-let rec exec_commands (t: turtle) (l: command list) ((coefx, coefy) : (float * float)): turtle =
+let rec exec_commands (t: turtle) (l: command list) ((coefx, coefy) : (float * float)) (maxx, maxy) : turtle =
   match l with
   | [] -> t
-  | x :: l -> exec_commands (exec_command t x (coefx, coefy)) l (coefx, coefy)
+  | x :: l -> exec_commands (exec_command t x (coefx, coefy) (maxx, maxy)) l (coefx, coefy) (maxx, maxy)
 ;;
