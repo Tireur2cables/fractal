@@ -76,13 +76,16 @@ let action_what () =
 let action_file () =
   let path = "./examples/br3.sys" in
   let iter = 3 in
-  match Array.length Sys.argv with
-  | 1
-  | 2 -> start path iter
-  | 3 -> (try let x = int_of_string Sys.argv.(2) in start path x
-  		with Failure _ -> start Sys.argv.(2) iter);
-  | _ -> (try let x = int_of_string Sys.argv.(2) in start Sys.argv.(3) x
-  		with Failure _ -> start Sys.argv.(2) (int_of_string Sys.argv.(3)));
+  begin
+    match Array.length Sys.argv with
+	  | 1
+	  | 2 -> start path iter
+	  | 3 -> (try let x = int_of_string Sys.argv.(2) in start path x
+	  		with Failure _ -> start Sys.argv.(2) iter);
+	  | _ -> try
+	  			let x = int_of_string Sys.argv.(2) in start Sys.argv.(3) x
+	  		with Failure _ -> start Sys.argv.(2) (int_of_string Sys.argv.(3));
+			end;
   exit 0
 ;;
 
