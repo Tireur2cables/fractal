@@ -87,12 +87,12 @@ let action_file () =
          try
            let x = int_of_string Sys.argv.(2) in
            start path x
-	     with Failure _ -> start Sys.argv.(2) iter
+         with Failure _ -> start Sys.argv.(2) iter
        end
     | _ ->
        begin
          try
-	  	   let x = int_of_string Sys.argv.(2) in
+           let x = int_of_string Sys.argv.(2) in
            start Sys.argv.(3) x
 	     with Failure _ ->
                try
@@ -110,8 +110,8 @@ let cmdline_options =
     ("-what" , Arg.Unit action_what, "description");
     ("--custom" , Arg.Unit action_file, "specify custom path and/or custom number of iteration");
     ("-custom" , Arg.Unit action_file, "specify custom path and/or custom number of iteration");
-	("-c" , Arg.Unit action_file, "specify custom path and/or custom number of iteration");
-	("--c" , Arg.Unit action_file, "specify custom path and/or custom number of iteration");
+    ("-c" , Arg.Unit action_file, "specify custom path and/or custom number of iteration");
+    ("--c" , Arg.Unit action_file, "specify custom path and/or custom number of iteration");
   ]
 ;;
 
