@@ -53,7 +53,7 @@ let rewrite turtle system degre =
 
 let path = "./examples/br3.sys";;
 
-let iter = 3;;  
+let iter = 3;;
 
 let start file nb =
 	open_window 800 800;
@@ -98,7 +98,7 @@ let action_file () =
                try
                  start Sys.argv.(2) (int_of_string Sys.argv.(3))
                with Failure _ -> failwith "Il faut donner un nombre sur un des deux paramètres!"
-         
+
        end
   end;
     exit 0
@@ -109,7 +109,9 @@ let cmdline_options =
     ("--what" , Arg.Unit action_what, "description");
     ("-what" , Arg.Unit action_what, "description");
     ("--custom" , Arg.Unit action_file, "specify custom path and/or custom number of iteration");
-    ("-custom" , Arg.Unit action_file, "specify custom path and/or custom number of iteration")
+    ("-custom" , Arg.Unit action_file, "specify custom path and/or custom number of iteration");
+	("-c" , Arg.Unit action_file, "specify custom path and/or custom number of iteration");
+	("--c" , Arg.Unit action_file, "specify custom path and/or custom number of iteration");
   ]
 ;;
 
