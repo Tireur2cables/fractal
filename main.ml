@@ -8,19 +8,32 @@ open Graphics;;
     http://caml.inria.fr/pub/docs/manual-ocaml/libref/Arg.html
 *)
 
+let path = ref "examples/br3.sys";;
+
+let iter = ref 7;;
 
 let usage = (* Entete du message d'aide pour --help *)
   "Interpretation de L-systemes et dessins fractals"
 ;;
 
 let action_what () =
-  Printf.printf "%s\n" usage;
+  print_string (usage ^ "\n");
   exit 0
 ;;
 
-let cmdline_options = [
-("--what" , Arg.Unit action_what, "description");
-]
+let change_path p = path := p;;
+
+let change_iter i = iter := i;;
+
+let cmdline_options =
+  [
+    ("-what" , Arg.Unit action_what, "description");
+    ("--what" , Arg.Unit action_what, "description");
+    ("-path" , Arg.String change_path, "changement du fichier à utiliser");
+    ("--path" , Arg.String change_path, "changement du fichier à utiliser");
+    ("-iter" , Arg.Int change_iter, "changement du nombre d'itération à utiliser");
+    ("--iter" , Arg.Int change_iter, "changement du nombre d'itération à utiliser")
+  ]
 ;;
 
 let extra_arg_action = fun s -> failwith ("Argument inconnu :"^s);;
@@ -76,9 +89,9 @@ let rewrite turtle system degre =
 let main () =
   Arg.parse cmdline_options extra_arg_action usage;
   open_window 800 800;
-  let system = interpret_file "./examples/br3.sys" in
+  let system = interpret_file !path in
   let turtle = (create_turtle ()) in
-  let turle_fin = rewrite turtle system 7 in
+  let turle_fin = rewrite turtle system !iter in
   close_after_event ()
 ;;
 (** On ne lance ce main que dans le cas d'un programme autonome
