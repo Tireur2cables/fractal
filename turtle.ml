@@ -88,8 +88,8 @@ let exec_command (t: turtle) (c: command) ((x,y) : (float * float)): (turtle) =
   match c with
 
   | Line i -> (* move while drawing by i pixels *)
-     lineto (int_of_float (x *.((float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.x) )
-       (int_of_float (x *. ((float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.y) );
+     lineto (max ((int_of_float (((float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.x))) 1)
+       (max ((int_of_float (((float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.y))) 1);
      {current_pos = {
         x = float_of_int (current_x ());
         y = float_of_int (current_y ());

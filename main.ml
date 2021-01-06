@@ -103,14 +103,15 @@ let rewrite turtle system degre draw =
 
 let main () =
   Arg.parse cmdline_options extra_arg_action usage;
-  open_window 800 800;
-  let system = interpret_file "./examples/br3.sys" in
+  open_window 1000 1000;
+  let system = interpret_file "./examples/snow.sys" in
   let turtle2 = (create_turtle ()) in
-  let ((x,y), turtlef) = calc turtle2 system 15 (0.,0.) in
-  print_float (800./.x);
-  print_float (800./.y);
+  let ((x,y), turtlef) = calc turtle2 system 4 (0.,0.) in
+  print_float (x);
+  print_string "\n";
+  print_float (y);
   let turtle = (create_turtle ()) in
-  let turle_fin = rewrite turtle system 15 (800./.x,800./.x) in
+  let turle_fin = rewrite turtle system 4 (800./.x,800./.y) in
   close_after_event ()
 ;;
 (** On ne lance ce main que dans le cas d'un programme autonome
