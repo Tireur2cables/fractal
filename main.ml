@@ -3,29 +3,6 @@ open Systems;;
 open Turtle;;
 open Graphics;;
 
-(** Gestion des arguments de la ligne de commande.
-    Nous suggérons l'utilisation du module Arg
-    http://caml.inria.fr/pub/docs/manual-ocaml/libref/Arg.html
-*)
-
-
-let usage = (* Entete du message d'aide pour --help *)
-  "Interpretation de L-systemes et dessins fractals"
-;;
-
-let action_what () =
-  Printf.printf "%s\n" usage;
-  exit 0
-;;
-
-let cmdline_options = [
-("--what" , Arg.Unit action_what, "description");
-]
-;;
-
-let extra_arg_action = fun s -> failwith ("Argument inconnu :"^s);;
-
-
 let open_window w h =
   open_graph (" " ^ (string_of_int w) ^ "x" ^ (string_of_int h));
   auto_synchronize true
@@ -73,13 +50,74 @@ let rewrite turtle system degre =
 	fun_aux turtle (string_of_word system.axiom)
 ;;
 
+
+let path = "./examples/br3.sys";;
+
+let iter = 3;;
+
+let start file nb =
+	open_window 800 800;
+	let system = interpret_file file in
+	let turtle = (create_turtle ()) in
+	let turle_fin = rewrite turtle system nb in
+	close_after_event ()
+;;
+
+(** Gestion des arguments de la ligne de commande.
+    Nous suggérons l'utilisation du module Arg
+    http://caml.inria.fr/pub/docs/manual-ocaml/libref/Arg.html
+*)
+let usage = (* Entete du message d'aide pour --help *)
+  "Interpretation de L-systemes et dessins fractals"
+;;
+
+let extra_arg_action = fun s -> failwith ("Argument inconnu :"^s);;
+
+let action_what () =
+ print_string (usage ^ "\n");
+ exit 0
+;;
+
+let action_file () =
+  begin
+    match Array.length Sys.argv with
+    | 1 | 2 -> start path iter
+    | 3 ->
+       begin
+         try
+           let x = int_of_string Sys.argv.(2) in
+           start path x
+         with Failure _ -> start Sys.argv.(2) iter
+       end
+    | _ ->
+       begin
+         try
+           let x = int_of_string Sys.argv.(2) in
+           start Sys.argv.(3) x
+	     with Failure _ ->
+               try
+                 start Sys.argv.(2) (int_of_string Sys.argv.(3))
+               with Failure _ -> failwith "Il faut donner un nombre sur un des deux paramètres!"
+
+       end
+  end;
+    exit 0
+;;
+
+let cmdline_options =
+  [
+    ("--what" , Arg.Unit action_what, "description");
+    ("-what" , Arg.Unit action_what, "description");
+    ("--custom" , Arg.Unit action_file, "specify custom path and/or custom number of iteration");
+    ("-custom" , Arg.Unit action_file, "specify custom path and/or custom number of iteration");
+    ("-c" , Arg.Unit action_file, "specify custom path and/or custom number of iteration");
+    ("--c" , Arg.Unit action_file, "specify custom path and/or custom number of iteration");
+  ]
+;;
+
 let main () =
   Arg.parse cmdline_options extra_arg_action usage;
-  open_window 800 800;
-  let system = interpret_file "./examples/br3.sys" in
-  let turtle = (create_turtle ()) in
-  let turle_fin = rewrite turtle system 7 in
-  close_after_event ()
+  start path iter
 ;;
 (** On ne lance ce main que dans le cas d'un programme autonome
     (c'est-à-dire que l'on est pas dans un "toplevel" ocaml interactif).
