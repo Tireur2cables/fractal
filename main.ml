@@ -94,7 +94,11 @@ let action_file () =
          try
 	  	   let x = int_of_string Sys.argv.(2) in
            start Sys.argv.(3) x
-	     with Failure _ -> start Sys.argv.(2) (int_of_string Sys.argv.(3))
+	     with Failure _ ->
+               try
+                 start Sys.argv.(2) (int_of_string Sys.argv.(3))
+               with Failure _ -> failwith "Il faut donner un nombre sur un des deux paramètres!"
+         
        end
   end;
     exit 0
