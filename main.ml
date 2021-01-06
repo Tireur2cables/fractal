@@ -13,19 +13,6 @@ let usage = (* Entete du message d'aide pour --help *)
   "Interpretation de L-systemes et dessins fractals"
 ;;
 
-let action_what () =
-  Printf.printf "%s\n" usage;
-  exit 0
-;;
-
-let cmdline_options = [
-("--what" , Arg.Unit action_what, "description");
-]
-;;
-
-let extra_arg_action = fun s -> failwith ("Argument inconnu :"^s);;
-
-
 let open_window w h =
   open_graph (" " ^ (string_of_int w) ^ "x" ^ (string_of_int h));
   auto_synchronize true
@@ -73,13 +60,37 @@ let rewrite turtle system degre =
 	fun_aux turtle (string_of_word system.axiom)
 ;;
 
+let start file =
+	open_window 800 800;
+	let system = interpret_file file in
+	let turtle = (create_turtle ()) in
+	let turle_fin = rewrite turtle system 7 in
+	close_after_event ()
+;;
+
+let action_what () =
+  Printf.printf "%s\n" usage;
+  exit 0
+;;
+
+let action_file () =
+  if Array.length Sys.argv = 2
+  then start "./examples/br3.sys"
+  else start Sys.argv.(2);
+  exit 0
+;;
+
+let cmdline_options = [
+("--what" , Arg.Unit action_what, "description");
+("--f" , Arg.Unit action_file, "description");
+]
+;;
+
+let extra_arg_action = fun s -> failwith ("Argument inconnu :"^s);;
+
+
 let main () =
   Arg.parse cmdline_options extra_arg_action usage;
-  open_window 800 800;
-  let system = interpret_file "./examples/br3.sys" in
-  let turtle = (create_turtle ()) in
-  let turle_fin = rewrite turtle system 7 in
-  close_after_event ()
 ;;
 (** On ne lance ce main que dans le cas d'un programme autonome
     (c'est-à-dire que l'on est pas dans un "toplevel" ocaml interactif).
