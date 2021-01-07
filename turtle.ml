@@ -27,8 +27,8 @@ exception Restoration_failure of string;;
 let pi = 4.0 *. atan 1.0;;
 
 let round f =
-  let dessus = ceile f in
-  if dessus -. f >= 0.5 then dessus
+  let dessus = ceil f in
+  if dessus -. f < 0.5 then dessus
   else floor f
 ;;
 
@@ -46,8 +46,14 @@ let exec_command (t: turtle) (c: command) : (turtle) =
 
   | Line i -> (* move while drawing by i pixels *)
      let newx = (float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi)) in
+	 let newx = round newx in
+	 print_float newx;
+	 print_string "\n";
      let newx = int_of_float (newx +. t.current_pos.x) in
+	 print_int newx;
+	 print_string "\n";
      let newy = (float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi)) in
+	 let newy = round newy in
      let newy = int_of_float (newy +. t.current_pos.y) in
      lineto (newx) (newy);
      {current_pos = {
