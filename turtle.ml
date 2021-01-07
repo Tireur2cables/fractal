@@ -45,10 +45,10 @@ let exec_command (t: turtle) (c: command) : (turtle) =
   match c with
 
   | Line i -> (* move while drawing by i pixels *)
-     let newx = (float_of_int i/2) *. (cos ((t.current_pos.a /. 180.) *. pi)) in
+     let newx = (float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi)) in
 	 let newx = round newx in
      let newx = int_of_float (newx +. t.current_pos.x) in
-     let newy = (float_of_int i/2) *. (sin ((t.current_pos.a /. 180.) *. pi)) in
+     let newy = (float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi)) in
 	 let newy = round newy in
      let newy = int_of_float (newy +. t.current_pos.y) in
      lineto (newx) (newy);
