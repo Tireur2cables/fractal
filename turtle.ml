@@ -28,7 +28,16 @@ let pi = 4.0 *. atan 1.0;;
 
 let round f =
   let dessus = ceil f in
-  if dessus -. f < 0.5 then dessus
+  (*print_float f;
+  print_string "  ";
+  print_float dessus;
+  print_string "  ";*)
+  if ((dessus-.f-.0.5)) < 0.000001 then (print_string "oui") else (print_string "non");
+  print_string "\n";
+ (* print_int (compare (dessus-.f) 0.5);
+  print_string "\n";*)
+
+  if ((dessus-.f-.0.5)) < 0.000000000000001 then dessus
   else floor f
 ;;
 
@@ -45,16 +54,18 @@ let exec_command (t: turtle) (c: command) : (turtle) =
   match c with
 
   | Line i -> (* move while drawing by i pixels *)
-     let newx = (float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi)) in
+     let newx = (float_of_int 5) *. (cos ((t.current_pos.a /. 180.) *. pi)) in
 	 let newx = round newx in
-	 print_float newx;
-	 print_string "\n";
      let newx = int_of_float (newx +. t.current_pos.x) in
-	 print_int newx;
-	 print_string "\n";
-     let newy = (float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi)) in
+     let newy = (float_of_int 5) *. (sin ((t.current_pos.a /. 180.) *. pi)) in
+	 (*print_float newy;
+	 print_string "\n";*)
 	 let newy = round newy in
+	 (*print_float newy;
+	 print_string "\n";*)
      let newy = int_of_float (newy +. t.current_pos.y) in
+	 (*print_int newy;
+	 print_string "\n";*)
      lineto (newx) (newy);
      {current_pos = {
         x = float_of_int (current_x ());
