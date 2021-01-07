@@ -24,30 +24,58 @@ let try_exec (t: turtle) (l: command list) : (turtle) =
      create_turtle ()
 ;;
 
-let rec rewrite_aux turtle system degre symbol =
+let rec calc_aux turtle system degre symbol (hp, vp, hn, vn) =
   if degre = 0 then
-    exec_commands turtle (system.interp symbol)
+    calc_commands turtle (system.interp symbol) (hp, vp, hn, vn)
   else
-	let rec fun_aux turtle s =
+	let rec fun_aux turtle (hp, vp, hn, vn) s =
+	  match s with
+	  | "" -> (hp, vp, hn, vn, turtle)
+	  | s ->
+         let sub = String.sub s 1 (String.length s - 1) in
+		 let (xmax, ymax, xmin, ymin, tort) = calc_aux turtle system (degre-1) (String.make 1 s.[0]) (hp, vp, hn, vn) in
+         fun_aux tort (xmax, ymax, xmin, ymin) sub
+	in
+    let res = string_of_word (system.rules symbol) in
+    fun_aux turtle (hp, vp, hn, vn) res
+;;
+
+let calc turtle system degre curr_dim =
+	let rec fun_aux turtle curr_dim s =
+		match s with
+		| "" -> (curr_dim, turtle)
+		| s ->
+           let sub = String.sub s 1 (String.length s - 1) in
+		   let (xmax, ymax, xmin, ymin, tort) = calc_aux turtle system degre (String.make 1 s.[0]) curr_dim in
+           fun_aux tort (xmax, ymax, xmin, ymin) sub
+	in
+	fun_aux turtle curr_dim (string_of_word system.axiom)
+;;
+
+let rec rewrite_aux turtle system degre symbol draw (maxx, maxy) =
+  if degre = 0 then
+    exec_commands turtle (system.interp symbol) draw (maxx, maxy)
+  else
+	let rec fun_aux turtle s (maxx, maxy) =
 	  match s with
 	  | "" -> turtle
 	  | s ->
          let sub = String.sub s 1 (String.length s - 1) in
-         fun_aux (rewrite_aux turtle system (degre-1) (String.make 1 s.[0])) sub
+         fun_aux (rewrite_aux turtle system (degre-1) (String.make 1 s.[0]) draw (maxx, maxy)) sub (maxx, maxy)
 	in
-    let res = string_of_word (system.rules symbol) in (* ATTENTION : mise en mémoire des itérations *)
-    fun_aux turtle res
+    let res = string_of_word (system.rules symbol) in
+    fun_aux turtle res (maxx, maxy)
 ;;
 
-let rewrite turtle system degre =
-	let rec fun_aux turtle s =
+let rewrite turtle system degre draw (maxx, maxy) =
+	let rec fun_aux turtle s (maxx, maxy) =
 		match s with
 		| "" -> turtle
 		| s ->
            let sub = String.sub s 1 (String.length s - 1) in
-           fun_aux (rewrite_aux turtle system degre (String.make 1 s.[0])) sub
+           fun_aux (rewrite_aux turtle system degre (String.make 1 s.[0]) draw (maxx, maxy)) sub (maxx, maxy)
 	in
-	fun_aux turtle (string_of_word system.axiom)
+	fun_aux turtle (string_of_word system.axiom) (maxx, maxy)
 ;;
 
 
