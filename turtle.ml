@@ -26,6 +26,12 @@ exception Restoration_failure of string;;
 
 let pi = 4.0 *. atan 1.0;;
 
+let round f =
+  let dessus = ceile f in
+  if dessus -. f >= 0.5 then dessus
+  else floor f
+;;
+
 let create_turtle () =
   moveto 400 400; (* move to middle bottom *)
   {current_pos = {
@@ -81,7 +87,7 @@ let exec_command (t: turtle) (c: command) : (turtle) =
           moveto (int_of_float s.x) (int_of_float s.y);
           {current_pos = s;
            saved_pos = l} (* list without s *)
-        end       
+        end
 ;;
 
 
