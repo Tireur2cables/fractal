@@ -33,7 +33,7 @@ let round f =
 ;;
 
 let create_turtle () =
-  moveto 400 400; (* move to middle bottom *)
+  moveto 0 0;
   {current_pos = {
      x = float_of_int (current_x ());
      y = float_of_int (current_y ());
@@ -42,7 +42,7 @@ let create_turtle () =
 ;;
 
 let create_turtle_at x y =
-  moveto x y; (* move to middle bottom *)
+  moveto x y;
   {current_pos = {
      x = float_of_int (current_x ());
      y = float_of_int (current_y ());
@@ -54,15 +54,17 @@ let calc_size t c (hp, vp, hn, vn) =
   match c with
   | Line i ->
      let newx = (float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi)) in
-	 let coefx = round newx in
-     let newx = int_of_float (coefx +. t.current_pos.x) in
+	 let newx = round newx in
+     let coefx = newx +. t.current_pos.x in
+     let newx = int_of_float coefx in
      let newy = (float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi)) in
-	 let coefy = round newy in
-     let newy = int_of_float (coefy +. t.current_pos.y) in
-     let hp = if coefx > 0. then hp +. coefx else hp in
-     let vp = if coefy > 0. then vp +. coefy else vp in
-     let hn = if coefx < 0. then hn +. coefx else hn in
-     let vn = if coefy < 0. then vn +. coefy else vn in
+	 let newy = round newy in
+     let coefy = newy +. t.current_pos.y in
+     let newy = int_of_float coefy in
+     let hp = max hp coefx in
+     let vp = max vp coefy in
+     let hn = min hn coefx in
+     let vn = min vn coefy in
      (hp, vp, hn, vn, {
           current_pos = {
   		    x = float_of_int newx;
@@ -71,15 +73,17 @@ let calc_size t c (hp, vp, hn, vn) =
           saved_pos = t.saved_pos})
   | Move i ->
      let newx = (float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi)) in
-	 let coefx = round newx in
-     let newx = int_of_float (coefx +. t.current_pos.x) in
+	 let newx = round newx in
+     let coefx = newx +. t.current_pos.x in
+     let newx = int_of_float coefx in
      let newy = (float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi)) in
-	 let coefy = round newy in
-     let newy = int_of_float (coefy +. t.current_pos.y) in
-     let hp = if coefx > 0. then hp +. coefx else hp in
-     let vp = if coefy > 0. then vp +. coefy else vp in
-     let hn = if coefx < 0. then hn +. coefx else hn in
-     let vn = if coefy < 0. then vn +. coefy else vn in
+	 let newy = round newy in
+     let coefy = newy +. t.current_pos.y in
+     let newy = int_of_float coefy in
+     let hp = max hp coefx in
+     let vp = max vp coefy in
+     let hn = min hn coefx in
+     let vn = min vn coefy in
      (hp, vp, hn, vn, {
           current_pos = {
   		    x = float_of_int newx;
@@ -117,10 +121,10 @@ let exec_command (t: turtle) (c: command) (coefx, coefy) (maxx, maxy) : (turtle)
   match c with
 
   | Line i -> (* move while drawing by i pixels *)
-     let newx = ((maxx/.coefx)*.(float_of_int i)) *. (cos ((t.current_pos.a /. 180.) *. pi)) in
+     let newx = (coefx *. (float_of_int i)) *. (cos ((t.current_pos.a /. 180.) *. pi)) in
 	 let newx = round newx in
      let newx = int_of_float (newx +. t.current_pos.x) in
-     let newy = ((maxx/.coefx)*.(float_of_int i)) *. (sin ((t.current_pos.a /. 180.) *. pi)) in
+     let newy = (coefy *. (float_of_int i)) *. (sin ((t.current_pos.a /. 180.) *. pi)) in
 	 let newy = round newy in
      let newy = int_of_float (newy +. t.current_pos.y) in
      lineto (newx) (newy);
@@ -131,9 +135,9 @@ let exec_command (t: turtle) (c: command) (coefx, coefy) (maxx, maxy) : (turtle)
       saved_pos = t.saved_pos}
 
   | Move i -> (* move without drawing by i pixels *)
-     let newx = (float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi)) in
+     let newx = coefx *. (float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi)) in
      let newx = int_of_float (newx +. t.current_pos.x) in
-     let newy = (float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi)) in
+     let newy = coefy *. (float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi)) in
      let newy = int_of_float (newy +. t.current_pos.y) in
      moveto (newx) (newy);
      {current_pos = {

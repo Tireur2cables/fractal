@@ -84,16 +84,33 @@ let path = "./examples/br3.sys";;
 let iter = 3;;
 
 let start file nb =
-  let taillex = 800 in
-  let tailley = 800 in
+  let taillex = 800. in
+  let tailley = 800. in
   let system = interpret_file file in
-  let turtle = create_turtle () in
-  let ((xmax, ymax, xmin, ymin), turtlef) = calc turtle system nb (0., 0., 0., 0.) in
-  let coefx = max xmin xmax in
-  let coefy = max ymax ymin in
-  print_float coefx;
-  open_window taillex tailley;
-  let turle_fin = rewrite (create_turtle ()) system nb (coefx, coefy) (float_of_int taillex, float_of_int tailley) in
+  let ((xmax, ymax, xmin, ymin), turtlef) = calc (create_turtle ()) system nb (0., 0., 0., 0.) in
+  let coefx = xmax -. xmin in
+  let coefy = ymax -. ymin in
+  let coefx = if coefx <= taillex then 1. else taillex /. coefx in
+  let coefy = if coefy <= tailley then 1. else tailley /. coefy in
+  let posxmax = taillex -. (xmax *. coefx) in
+  let posymax = tailley -. (ymax *. coefy) in
+  let posxmin = 0. -. (xmin *. coefx) in
+  let posymin = 0. -. (ymin *. coefy) in
+  let middlex = taillex /. 2. in
+  let middley = tailley /. 2. in
+  let posx = int_of_float (
+                 if middlex +. xmax < taillex && middlex -. xmin > 0. then middlex
+                 else if abs (int_of_float (posxmax -. middlex)) < abs (int_of_float (posxmin -. middlex))
+                 then posxmax else posxmin
+               ) in
+  let posy = int_of_float (
+                 if middley +. ymax < tailley && middley -. ymin > 0. then middley
+                 else if abs (int_of_float (posymax -. middley)) < abs (int_of_float (posymin -. middley))
+                 then posymax else posymin
+               ) in
+  print_float coefx; print_string " "; print_float coefy; print_string "\n";
+  open_window (int_of_float taillex) (int_of_float tailley);
+  let turle_fin = rewrite (create_turtle_at posx posy) system nb (coefx, coefy) (taillex, tailley) in
   close_after_event ()
 ;;
 
