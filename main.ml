@@ -84,8 +84,8 @@ let path = "./examples/br1.sys";;
 let iter = 5;;
 
 let start file nb =
-  let taillex = 800. in
-  let tailley = 800. in
+  let taillex = 1000. in
+  let tailley = 1000. in
   let system = interpret_file file in
   let ((xmax, ymax, xmin, ymin), turtlef) = calc (create_turtle ()) system nb (0., 0., 0., 0.) in
   let coefx = xmax -. xmin in
