@@ -28,6 +28,8 @@ val pi : float
 
 val create_turtle : unit -> turtle
 
+val create_turtle_at : int -> int -> turtle
+
 val calc_size : turtle -> command -> (float * float * float * float) -> (float * float * float *float * turtle)
 
 val calc_commands : turtle -> command list -> (float * float * float * float) -> (float * float * float * float * turtle)

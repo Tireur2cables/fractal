@@ -41,6 +41,15 @@ let create_turtle () =
   saved_pos = []} (* No saved postion *)
 ;;
 
+let create_turtle_at x y =
+  moveto x y; (* move to middle bottom *)
+  {current_pos = {
+     x = float_of_int (current_x ());
+     y = float_of_int (current_y ());
+     a = 90.}; (* default angle = 90 = toward top of screen *)
+  saved_pos = []} (* No saved postion *)
+;;
+
 let calc_size t c (hp, vp, hn, vn) =
   match c with
   | Line i ->
