@@ -84,11 +84,17 @@ let path = "./examples/br3.sys";;
 let iter = 3;;
 
 let start file nb =
-	open_window 800 800;
-	let system = interpret_file file in
-	let turtle = (create_turtle ()) in
-	let turle_fin = rewrite turtle system nb in
-	close_after_event ()
+  let taillex = 800 in
+  let tailley = 800 in
+  let system = interpret_file file in
+  let turtle = create_turtle () in
+  let ((xmax, ymax, xmin, ymin), turtlef) = calc turtle system nb (0., 0., 0., 0.) in
+  let coefx = min xmin xmax in
+  let coefy = min ymax ymin in
+  let turtle = create_turtle () in
+  open_window taillex tailley;
+  let turle_fin = rewrite turtle system nb (coefx, coefy) (float_of_int taillex, float_of_int tailley) in
+  close_after_event ()
 ;;
 
 (** Gestion des arguments de la ligne de commande.
