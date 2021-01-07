@@ -27,7 +27,7 @@ exception Restoration_failure of string;;
 let pi = 4.0 *. atan 1.0;;
 
 let create_turtle () =
-  moveto 400 0; (* move to middle bottom *)
+  moveto 400 400; (* move to middle bottom *)
   {current_pos = {
      x = float_of_int (current_x ());
      y = float_of_int (current_y ());
@@ -39,8 +39,11 @@ let exec_command (t: turtle) (c: command) : (turtle) =
   match c with
 
   | Line i -> (* move while drawing by i pixels *)
-     lineto (int_of_float ( ((float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.x) )
-       (int_of_float ( ((float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.y) );
+     let newx = (float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi)) in
+     let newx = int_of_float (newx +. t.current_pos.x) in
+     let newy = (float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi)) in
+     let newy = int_of_float (newy +. t.current_pos.y) in
+     lineto (newx) (newy);
      {current_pos = {
         x = float_of_int (current_x ());
         y = float_of_int (current_y ());
@@ -48,8 +51,11 @@ let exec_command (t: turtle) (c: command) : (turtle) =
       saved_pos = t.saved_pos}
 
   | Move i -> (* move without drawing by i pixels *)
-     moveto (int_of_float ( ((float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.x) )
-       (int_of_float ( ((float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi))) +. t.current_pos.y) );
+     let newx = (float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi)) in
+     let newx = int_of_float (newx +. t.current_pos.x) in
+     let newy = (float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi)) in
+     let newy = int_of_float (newy +. t.current_pos.y) in
+     moveto (newx) (newy);
      {current_pos = {
         x = float_of_int (current_x ());
         y = float_of_int (current_y ());
