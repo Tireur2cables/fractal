@@ -15,9 +15,9 @@ let close_after_event () =
     Graphic_failure s -> exit 0
 ;;
 
-let try_exec (t: turtle) (l: command list) : (turtle) =
+let try_exec (t: turtle) (l: command list) (coefx, coefy) (maxx, maxy) : (turtle) =
   try
-    exec_commands t l
+    exec_commands t l (coefx, coefy) (maxx, maxy)
   with
   | Restoration_failure s ->
      print_string s;
