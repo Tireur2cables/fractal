@@ -79,9 +79,9 @@ let rewrite turtle system degre draw (maxx, maxy) =
 ;;
 
 
-let path = "./examples/br3.sys";;
+let path = "./examples/br1.sys";;
 
-let iter = 3;;
+let iter = 5;;
 
 let start file nb =
   let taillex = 800. in
@@ -110,7 +110,7 @@ let start file nb =
                ) in
   print_float coefx; print_string " "; print_float coefy; print_string "\n";
   open_window (int_of_float taillex) (int_of_float tailley);
-  let turle_fin = rewrite (create_turtle_at posx posy) system nb (coefx, coefy) (taillex, tailley) in
+  let turle_fin = rewrite (create_turtle_at posx posy) system nb (min coefx coefy, min coefx coefy) (taillex, tailley) in
   close_after_event ()
 ;;
 
