@@ -91,9 +91,8 @@ let start file nb =
   let ((xmax, ymax, xmin, ymin), turtlef) = calc turtle system nb (0., 0., 0., 0.) in
   let coefx = min xmin xmax in
   let coefy = min ymax ymin in
-  let turtle = create_turtle () in
   open_window taillex tailley;
-  let turle_fin = rewrite turtle system nb (coefx, coefy) (float_of_int taillex, float_of_int tailley) in
+  let turle_fin = rewrite (create_turtle ()) system nb (coefx, coefy) (float_of_int taillex, float_of_int tailley) in
   close_after_event ()
 ;;
 
