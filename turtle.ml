@@ -33,7 +33,7 @@ let round f =
 ;;
 
 let create_turtle () =
-  moveto 400 400; (* move to middle bottom *)
+  moveto 0 0;
   {current_pos = {
      x = float_of_int (current_x ());
      y = float_of_int (current_y ());
@@ -41,14 +41,90 @@ let create_turtle () =
   saved_pos = []} (* No saved postion *)
 ;;
 
-let exec_command (t: turtle) (c: command) : (turtle) =
+let create_turtle_at x y =
+  moveto x y;
+  {current_pos = {
+     x = float_of_int (current_x ());
+     y = float_of_int (current_y ());
+     a = 90.}; (* default angle = 90 = toward top of screen *)
+  saved_pos = []} (* No saved postion *)
+;;
+
+let calc_size t c (hp, vp, hn, vn) =
+  match c with
+  | Line i ->
+     let newx = (float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi)) in
+	 let newx = round newx in
+     let coefx = newx +. t.current_pos.x in
+     let newx = int_of_float coefx in
+     let newy = (float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi)) in
+	 let newy = round newy in
+     let coefy = newy +. t.current_pos.y in
+     let newy = int_of_float coefy in
+     let hp = max hp coefx in
+     let vp = max vp coefy in
+     let hn = min hn coefx in
+     let vn = min vn coefy in
+     (hp, vp, hn, vn, {
+          current_pos = {
+  		    x = float_of_int newx;
+  		    y = float_of_int newy;
+  		    a = t.current_pos.a};
+          saved_pos = t.saved_pos})
+  | Move i ->
+     let newx = (float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi)) in
+	 let newx = round newx in
+     let coefx = newx +. t.current_pos.x in
+     let newx = int_of_float coefx in
+     let newy = (float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi)) in
+	 let newy = round newy in
+     let coefy = newy +. t.current_pos.y in
+     let newy = int_of_float coefy in
+     let hp = max hp coefx in
+     let vp = max vp coefy in
+     let hn = min hn coefx in
+     let vn = min vn coefy in
+     (hp, vp, hn, vn, {
+          current_pos = {
+  		    x = float_of_int newx;
+  		    y = float_of_int newy;
+  		    a = t.current_pos.a};
+          saved_pos = t.saved_pos})
+  | Turn i -> (* turn by i degrees *)
+	 (hp, vp, hn, vn, {
+          current_pos = {
+	        x = t.current_pos.x;
+	        y = t.current_pos.y;
+	        a = mod_float ( t.current_pos.a +. (float_of_int i) ) 360.};
+	      saved_pos = t.saved_pos})
+
+  | Store -> (* save current_pos in saved_pos *)
+	 (hp, vp, hn, vn, {
+          current_pos = {
+	        x = t.current_pos.x;
+	        y = t.current_pos.y;
+	        a = t.current_pos.a};
+          saved_pos = t.current_pos :: t.saved_pos})
+
+  | Restore -> (* put saved_pos in current_pos if possible *)
+	 match t.saved_pos with
+	 | [] -> raise (Restoration_failure "Erreur de Restoration -> Aucune position sauvegardée!\n")
+	 | s :: l ->
+		begin
+		  (hp, vp, hn, vn, {
+               current_pos = s;
+		       saved_pos = l})
+		end
+;;
+
+let exec_command (t: turtle) (c: command) (coefx, coefy) (maxx, maxy) : (turtle) =
   match c with
 
   | Line i -> (* move while drawing by i pixels *)
-     let newx = (float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi)) in
+     let newx = (coefx *. (float_of_int i)) *. (cos ((t.current_pos.a /. 180.) *. pi)) in
 	 let newx = round newx in
      let newx = int_of_float (newx +. t.current_pos.x) in
-     let newy = (float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi)) in
+     let newy = (coefy *. (float_of_int i)) *. (sin ((t.current_pos.a /. 180.) *. pi)) in
 	 let newy = round newy in
      let newy = int_of_float (newy +. t.current_pos.y) in
      lineto (newx) (newy);
@@ -59,9 +135,9 @@ let exec_command (t: turtle) (c: command) : (turtle) =
       saved_pos = t.saved_pos}
 
   | Move i -> (* move without drawing by i pixels *)
-     let newx = (float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi)) in
+     let newx = coefx *. (float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi)) in
      let newx = int_of_float (newx +. t.current_pos.x) in
-     let newy = (float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi)) in
+     let newy = coefy *. (float_of_int i) *. (sin ((t.current_pos.a /. 180.) *. pi)) in
      let newy = int_of_float (newy +. t.current_pos.y) in
      moveto (newx) (newy);
      {current_pos = {
@@ -92,9 +168,18 @@ let exec_command (t: turtle) (c: command) : (turtle) =
         end
 ;;
 
+let rec calc_commands (t:turtle) (l:command list) (hp, vp, hn, vn) =
+  match l with
+  | [] -> (hp, vp, hn, vn, t)
+  | x :: l ->
+     begin
+	   let (hp, vp, hn, vn, tort) = calc_size t x (hp, vp, hn, vn) in
+	   calc_commands tort l (hp, vp, hn, vn)
+	 end
+;;
 
-let rec exec_commands (t: turtle) (l: command list) : turtle =
+let rec exec_commands (t: turtle) (l: command list) ((coefx, coefy) : (float * float)) (maxx, maxy) : turtle =
   match l with
   | [] -> t
-  | x :: l -> exec_commands (exec_command t x) l
+  | x :: l -> exec_commands (exec_command t x (coefx, coefy) (maxx, maxy)) l (coefx, coefy) (maxx, maxy)
 ;;

@@ -14,6 +14,7 @@ type position = {
     a: float;        (** angle of the direction *)
   }
 
+
 type turtle = {
     current_pos: position;
     saved_pos: position list;
@@ -27,6 +28,12 @@ val pi : float
 
 val create_turtle : unit -> turtle
 
-val exec_command : turtle -> command -> turtle
+val create_turtle_at : int -> int -> turtle
 
-val exec_commands : turtle -> command list -> turtle
+val calc_size : turtle -> command -> (float * float * float * float) -> (float * float * float *float * turtle)
+
+val calc_commands : turtle -> command list -> (float * float * float * float) -> (float * float * float * float * turtle)
+
+val exec_command : turtle -> command -> (float * float) -> (float * float) -> turtle
+
+val exec_commands : turtle -> command list -> (float * float) -> (float * float) -> turtle
