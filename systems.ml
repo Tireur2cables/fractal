@@ -12,21 +12,33 @@ type 's system = {
     rules : 's rewrite_rules;
     interp : 's -> Turtle.command list }
 
-(** Put here any type and function implementations concerning systems *)
+(** Here are the function concerning files interpretation *)
 
-let is_comment line =
+(**
+  Return true if line is a comment in sys file
+  false otherwise
+*)
+let is_comment (line :string) : (bool) =
   if (String.length line) > 0
   then line.[0] = '#'
   else false
 ;;
-
-let is_space line =
+(**
+  Return true if line is a spacing line in sys file
+  false otherwise
+*)
+let is_space (line :string) : (bool) =
   if (String.length line) = 0
   then true
   else line.[0] = '\n';
 ;;
 
-let rec interpret_line file block axiom rules inter  =
+(**
+  Interpret lines of the open channel "file", creating the three piece
+  of a L-System, depending of the three blocks the sys file is formatted in
+*)
+let rec interpret_line (file :in_channel) (block :int) (axiom :string)
+        (rules :string) (inter :string) : (string * string * string)  =
   try
     let x = input_line file in
     if is_comment x
@@ -46,8 +58,14 @@ let rec interpret_line file block axiom rules inter  =
   with End_of_file -> (axiom, rules, inter)
 ;;
 
-let word_of_string s =
-  let rec seq_of_string s res =
+(** Here are the functions concerning the making of L-Systems function *)
+
+(**
+  Convert the string "s" into a word (as the word type)
+*)
+let word_of_string (s :string) : ('s word) =
+
+  let rec seq_of_string (s :'s) (res : 's word list) : ('s word list * 's) =
     match s with
     | "" -> (res, s)
     | s ->
@@ -64,16 +82,19 @@ let word_of_string s =
        | ']' -> (res, sub)
        | c -> seq_of_string sub (res @ [Symb (String.make 1 c)])
   in
+
   match s with
-  | "" -> failwith "Erreur l'axiome est vide!"
+  | "" -> failwith "Erreur : axiom is empty"
   | s ->
      if String.length s = 1 then Symb s
      else
        let (res, str) = seq_of_string s [] in
        Seq res
 ;;
-
-let rec string_of_word w =
+(**
+  Convert the word "w" into a string
+*)
+let rec string_of_word (w :'s word) : (string) =
   match w with
   | Symb s -> s
   | Seq s ->
@@ -85,13 +106,13 @@ let rec string_of_word w =
   | Branch b -> "[" ^ (string_of_word b) ^ "]"
 ;;
 
-let rec create_paires list =
-  match list with
+let rec create_paires (l : 's list) : (('s * 's) list) =
+  match l with
   | [] -> []
-  | w :: list ->
+  | w :: l ->
      let res = String.split_on_char ' ' w in
-  	 if List.length res = 1 then [] (* mauvais formattage ou fin de ligne *)
-     else [(List.nth res 0, List.nth res 1)] @ (create_paires list)
+  	 if List.length res = 1 then [] (* Wrong format or end of line *)
+     else [(List.nth res 0, List.nth res 1)] @ (create_paires l)
 ;;
 
 let make_match_function action paires =
@@ -103,42 +124,65 @@ let make_match_function action paires =
   end
 ;;
 
-let create_rules rules =
+(**
+  Return the rewrites_rules function of the L-System, that the
+  string "rules" describ as a sequence of couples, each
+  separated by ":"
+*)
+let create_rules (rules :string) : ('s rewrite_rules) =
   let rules_list = String.split_on_char ':' rules in
   let rules_paires = create_paires rules_list in
+
   let transform (s1, s2) =
     (s1, word_of_string s2)
   in
+
   let paires = List.map transform rules_paires in
   make_match_function word_of_string paires
 ;;
 
-let create_interp inter =
+(**
+  Return the interpretation function of the L-System, that the
+  string "inter" describ as a sequence of couples, each
+  separated by ":"
+*)
+let create_interp (inter :string) : ('s -> Turtle.command list) =
   let inter_list = String.split_on_char ':' inter in
   let inter_paires = create_paires inter_list in
+
   let transform (s1,s2) =
+    let distance_str = String.sub s2 1 ((String.length s2)-1) in
+    let distance = int_of_string distance_str in
     match String.get s2 0 with
-    | 'L' -> (s1, [Turtle.Line (int_of_string (String.sub s2 1 ((String.length s2)-1)))])
-    | 'M' -> (s1, [Turtle.Move (int_of_string (String.sub s2 1 ((String.length s2)-1)))])
-    | 'T' -> (s1, [Turtle.Turn (int_of_string (String.sub s2 1 ((String.length s2)-1)))])
-    | _ -> failwith "Erreur commande de tortue inconnue!"
+    | 'L' -> (s1, [Turtle.Line distance])
+    | 'M' -> (s1, [Turtle.Move distance])
+    | 'T' -> (s1, [Turtle.Turn distance])
+    | _ -> failwith "Turtle error : Unknown turtle command"
   in
+
   let paires = List.map transform inter_paires in
-  let action s =
+
+  let action (s :string) : (Turtle.command list) =
     match s with
     | "[" -> [Turtle.Store]
     | "]" -> [Turtle.Restore]
-    | _ -> failwith ("Erreur " ^ s ^ " n'est pas dans la liste des interprétations!")
+    | _ -> failwith ("Error " ^ s ^ " is not in the interpretations list")
   in
+
   make_match_function action paires
 ;;
 
-let interpret_file file =
+(**
+  Return a triplet containing the axiom, rules of transformation and rules of
+  interpretation of the string "file" describing the path of a
+  formatted sys file
+*)
+let interpret_file (file : string) : ('s system) =
    let canal_in = open_in file in
-   let (axiom_str, rules_str, interp_str) = interpret_line canal_in 0 "" "" "" in
-   let axiom = word_of_string axiom_str in
+   let (ax_str, rules_str, inter_str) = interpret_line canal_in 0 "" "" "" in
+   let axiom = word_of_string ax_str in
    let rules = create_rules rules_str in
-   let interp = create_interp interp_str in
+   let interp = create_interp inter_str in
    close_in canal_in;
    {axiom = axiom; rules = rules; interp = interp}
 ;;
