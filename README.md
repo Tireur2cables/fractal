@@ -1,46 +1,36 @@
 Projet PF5 2020 : L-systèmes
 ============================
 
-## Prérequis à installer
+## Prérequis à installer  
 
-Voir [INSTALL.md](../INSTALL.md)
-
-  - ocaml évidemment
-  - dune et make sont fortement conseillés
-  - bibliothèque graphics si elle ne vient pas déjà avec ocaml
+  - `OCaml` évidemment (>= `4.05.0`).
+  - `dune` et `make` sont indispensables.
+  - La bibliothèque `Graphics` si elle ne vient pas déjà avec OCaml.  
 
 ## Compilation et lancement
 
-Par défaut, `make` est seulement utilisé pour abréger les commandes `dune` (voir `Makefile` pour plus de détails):
+Par défaut, `make` est seulement utilisé pour abréger les commandes `dune` (voir `Makefile` pour plus de détails) :
 
-  - `make` sans argument lancera la compilation `dune` de `main.exe`,
-    c'est-à-dire votre programme en code natif.
+- `make` sans argument lancera la compilation `dune` de `main.exe`, c'est-à-dire votre programme en code natif.
 
-  - `make byte` compilera si besoin en bytecode, utile pour faire
-    tourner votre code dans un toplevel OCaml, voir `lsystems.top`.
+- `make byte` compilera si besoin en bytecode, utile pour faire tourner votre code dans un toplevel OCaml, voir `lsystems.top`.
 
-  - `make clean` pour effacer le répertoire provisoire `_build` 
-    produit par `dune` lors de ses compilations.
+- `make clean` pour effacer le répertoire provisoire `_build` produit par `dune` lors de ses compilations.
 
-Enfin pour lancer votre programme: `./run arg1 arg2 ...`
+Enfin pour lancer le programme: `./run` suffit.  
+Vous pouvez également spécifiez un fichier L-système et/ou un nombre spécifique d'itérations via la l'option `-c`.  
+Par exmple : `./run -c examples/br1.sys 4`  
 
-## Tests en mode interactif sous emacs
+## Fichiers L-systèmes
 
-Votre programme doit avoir été compilé par `make byte`. Il faut bien sûr avoir installé `emacs`, 
-ainsi qu'un mode ocaml pour `emacs`,  par exemple `tuareg-mode`.
-  
-  - Dans un fichier `start.ml` extérieur au répertoire du projet, par exemple
-    au dessus du répertoire `projet`, recopiez le contenu de `lsystems.top`
-    sans sa première directive  (`#ocaml init`). Ajoutez aux chemins d'accès
-    des directives en `#directory` les préfixes nécessaires pour accéder aux
-    mêmes répertoires (par exemple `projet/` si vous êtes au dessus de `projet`).
+Pour que votre fichier L-système marche correctement avec notre programme il vous suffit de respecter les codes d'écritures présents dans les fichiers `.sys` du dossier `examples/`, à savoir :  
 
-  - Dans le même répertoire, ouvrez sous `emacs` votre fichier de tests. Faites-le
-    commencer par `#use "start.ml;;"`. Evaluez-simplement cette directive, ce qui
-    lancera l'interpréteur : vous pourrez ensuite effectuer vos tests. 
+- Les lignes commençant par # sont des lignes de commentaires, donc ignorées par le programme.  
 
-En cas de recompilation du programme (toujours par `make byte`), il vous
-faudra interrompre l'interpréteur par la directive `#quit;;` puis le relancer
-en réévaluant `#use "start.ml;;"`.
+- Le fichier contient 3 "bloques de données" séparés par des lignes vides ou retour à la ligne (`\n`).  
 
-  
+- Le premier bloque correspond à l'axiome initial du L-système.  
+
+- Le second bloque comprend une ligne par règle de transformations permettant d'agrandir l'axiome au fil des itérations. Si une variable ne possède pas une ligne de ce bloque le programme ne la transformera pas lors des itérations.  
+
+- Le dernier bloque est celui des interprétations en commandes tortues pour chaque variable. Il est important ici que chaque variables présentes dans l'axiome y possède une ligne dédiée.  
