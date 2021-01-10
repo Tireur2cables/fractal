@@ -40,5 +40,10 @@ Arrivés à ce stade nous avons pu nous atteler à animer la tortue. Cependant n
 
 ## AUTRE
 
-Comme nous avons pu le cité nous avons pu rencontrés beaucoup de problèmes avec les `Float` et les opérations sur ceux-ci ou encore certaines conversions obligatoires en entiers (par exemple pour `Graphics`). Cependant nous avons aussi rencontrés des problèmes dus à notre version d'OCaml qui est la `4.05.0` alors que beaucoup, et bien plus que ce qu'indique la documentation visiblement, de nouvelles fonctions nécessitent une version supérieure à `4.08`.  
-Nous avions également prévu d'ouvrir une fenêtre de Graphics de la taille de l'écran. Cependant nous n'avons pas pu trouver de modules permettant de faire cela et avons du nous résoudre à laisser une taille générique de 1000px par 1000px.  
+Comme nous avons pu le cité nous avons pu rencontrés beaucoup de problèmes avec les `Float` et les opérations sur ceux-ci ou encore certaines conversions obligatoires en 
+entiers (par exemple pour `Graphics`). Cependant nous avons aussi rencontrés des problèmes dus à notre version d'OCaml qui est la `4.05.0` 
+alors que beaucoup, et bien plus que ce qu'indique la documentation visiblement, de nouvelles fonctions nécessitent une version supérieure à `4.08`.  
+Nous avions également prévu d'ouvrir une fenêtre de Graphics de la taille de l'écran. Cependant nous n'avons pas pu trouver de modules permettant de faire 
+cela et avons du nous résoudre à laisser une taille générique de 1000px par 1000px.  
+Nous rencontrons aussi certains problèmes quand le dessin à afficher est beaucoup plus grand que la fenêtre d'affichage. En effet, on ne peut pas faire de tracés de moins de 
+1px avec la tortue, ce qui implique qu'un dessin trop grand ne pourra pas être affiché, ou pourra etre déformé.  
