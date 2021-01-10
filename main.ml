@@ -15,9 +15,9 @@ let close_after_event () =
     Graphic_failure s -> exit 0
 ;;
 
-let try_exec (t: turtle) (l: command list) (coefx, coefy) (maxx, maxy) : (turtle) =
+let try_exec (t: turtle) (l: command list) (coefx, coefy) : (turtle) =
   try
-    exec_commands t l (coefx, coefy) (maxx, maxy)
+    exec_commands t l (coefx, coefy)
   with
   | Restoration_failure s ->
      print_string s;
@@ -52,32 +52,31 @@ let calc turtle system degre curr_dim =
 	fun_aux turtle curr_dim (string_of_word system.axiom)
 ;;
 
-let rec rewrite_aux turtle system degre symbol draw (maxx, maxy) =
+let rec rewrite_aux turtle system degre symbol draw =
   if degre = 0 then
-    exec_commands turtle (system.interp symbol) draw (maxx, maxy)
+    try_exec turtle (system.interp symbol) draw
   else
-	let rec fun_aux turtle s (maxx, maxy) =
+	let rec fun_aux turtle s =
 	  match s with
 	  | "" -> turtle
 	  | s ->
          let sub = String.sub s 1 (String.length s - 1) in
-         fun_aux (rewrite_aux turtle system (degre-1) (String.make 1 s.[0]) draw (maxx, maxy)) sub (maxx, maxy)
+         fun_aux (rewrite_aux turtle system (degre-1) (String.make 1 s.[0]) draw) sub
 	in
     let res = string_of_word (system.rules symbol) in
-    fun_aux turtle res (maxx, maxy)
+    fun_aux turtle res
 ;;
 
-let rewrite turtle system degre draw (maxx, maxy) =
-	let rec fun_aux turtle s (maxx, maxy) =
+let rewrite turtle system degre draw =
+	let rec fun_aux turtle s =
 		match s with
 		| "" -> turtle
 		| s ->
            let sub = String.sub s 1 (String.length s - 1) in
-           fun_aux (rewrite_aux turtle system degre (String.make 1 s.[0]) draw (maxx, maxy)) sub (maxx, maxy)
+           fun_aux (rewrite_aux turtle system degre (String.make 1 s.[0]) draw) sub
 	in
-	fun_aux turtle (string_of_word system.axiom) (maxx, maxy)
+	fun_aux turtle (string_of_word system.axiom)
 ;;
-
 
 let path = "./examples/br1.sys";;
 
@@ -108,9 +107,8 @@ let start file nb =
                  else if abs (int_of_float (posymax -. middley)) < abs (int_of_float (posymin -. middley))
                  then posymax else posymin
                ) in
-  print_float coefx; print_string " "; print_float coefy; print_string "\n";
   open_window (int_of_float taillex) (int_of_float tailley);
-  let turle_fin = rewrite (create_turtle_at posx posy) system nb (min coefx coefy, min coefx coefy) (taillex, tailley) in
+  let turle_fin = rewrite (create_turtle_at posx posy) system nb (min coefx coefy, min coefx coefy) in
   close_after_event ()
 ;;
 
