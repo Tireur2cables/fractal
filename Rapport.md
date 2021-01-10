@@ -29,9 +29,10 @@ Notre programme se veut également modulaire avec un fichier `systems.ml` traita
 
 ## ORGANISATION DU TRAVAIL
 
-Ayant eu des emplois du temps extrêmement chargés dans la fin de l'année 2020, nous n'avions pas pu autant avancé que prévu sur le projet avant ce début d'année 2021.  
+Ayant eu des emplois du temps extrêmement chargés dans la fin de l'année 2020, nous n'avions pas pu autant avancer que prévu sur le projet avant ce début d'année 2021.  
 Cependant, avec une bonne répartition des tâches nous avons pu rapidement rattrapé le retard pris.  
-En effet la création de la tortue et la lecture des fichiers L-système ont été nos premiers objectifs.  
+En effet la création de la tortue et la lecture des fichiers L-système ont été nos premiers objectifs. Nous avions décidé à l'annonce du sujet que Nicolas s'occuperais de la 
+tortue et ses déplacements, et que Victor travaillerais sur la lecture des fichiers et leur transformations en type system.    
 Nous avons pu ensuite nous pencher tous les deux sur la tâche plus délicate de la transformations des L-systèmes en commandes pour la tortue.  
 Nous pouvions à présent tester notre programme et pour l'un résoudre les quelques bugs visibles à présent (comme certains problèmes de conversions des `Float`, déjà!, lors des appels aux fonctions de `Graphics`), pour l'autre ajouter la possibilité de spécifier un fichier et/ou nombre d'itérations via l'option `-c`.  
 Ensuite nous avons pu réfléchir ensemble au problème non négligeable de calcul de la taille du dessin et de son positionnement qui nous auront posés pas mal de soucis, tant au niveau de la réflexion qu'avec les `Float` (encore!).  
