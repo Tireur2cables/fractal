@@ -3,19 +3,19 @@ open Systems;;
 open Turtle;;
 open Graphics;;
 
+(** open a graphic window of size w * h *)
 let open_window w h =
   open_graph (" " ^ (string_of_int w) ^ "x" ^ (string_of_int h));
   auto_synchronize true
 ;;
 
-let close_after_event () =
-  try
-    ignore (wait_next_event [Button_down ; Key_pressed])
-  with
-    Graphic_failure s -> exit 0
+(** wait a click before closing the graph *)
+let close_after_event () : unit =
+  ignore (wait_next_event [Button_down ; Key_pressed])
 ;;
 
-let try_exec (t: turtle) (l: command list) (coefx, coefy) : (turtle) =
+(** try to execute the list of commands and eventually catch a Restoration exception *)
+let try_exec (t: turtle) (l: command list) ((coefx, coefy): float * float ) : (turtle) =
   try
     exec_commands t l (coefx, coefy)
   with
@@ -24,7 +24,9 @@ let try_exec (t: turtle) (l: command list) (coefx, coefy) : (turtle) =
      create_turtle ()
 ;;
 
-let rec calc_aux turtle system degre symbol (hp, vp, hn, vn) =
+(** transform the symbol a correct number of times and call the calc_commands for each symbol when finish *)
+let rec calc_aux (turtle: turtle) (system: 's system) (degre: int) (symbol: string)
+          ((hp, vp, hn, vn): float * float * float *float) : (float * float * float * float * turtle) =
   if degre = 0 then
     calc_commands turtle (system.interp symbol) (hp, vp, hn, vn)
   else
@@ -40,19 +42,22 @@ let rec calc_aux turtle system degre symbol (hp, vp, hn, vn) =
     fun_aux turtle (hp, vp, hn, vn) res
 ;;
 
-let calc turtle system degre curr_dim =
-	let rec fun_aux turtle curr_dim s =
-		match s with
-		| "" -> (curr_dim, turtle)
-		| s ->
-           let sub = String.sub s 1 (String.length s - 1) in
-		   let (xmax, ymax, xmin, ymin, tort) = calc_aux turtle system degre (String.make 1 s.[0]) curr_dim in
-           fun_aux tort (xmax, ymax, xmin, ymin) sub
-	in
-	fun_aux turtle curr_dim (string_of_word system.axiom)
+(** calls calc_aux on each symbol of the axiom *)
+let calc (turtle: turtle) (system: 's system) (degre: int)
+      (curr_dim: float * float * float * float) : ((float * float * float * float) * turtle) =
+  let rec fun_aux turtle curr_dim s =
+	match s with
+	| "" -> (curr_dim, turtle)
+	| s ->
+       let sub = String.sub s 1 (String.length s - 1) in
+	   let (xmax, ymax, xmin, ymin, tort) = calc_aux turtle system degre (String.make 1 s.[0]) curr_dim in
+       fun_aux tort (xmax, ymax, xmin, ymin) sub
+  in
+  fun_aux turtle curr_dim (string_of_word system.axiom)
 ;;
 
-let rec rewrite_aux turtle system degre symbol draw =
+(** transform the symbol a correct number of times and call the try_exec for each symbol when finish *)
+let rec rewrite_aux (turtle: turtle) (system: 's system) (degre: int) (symbol: string) (draw: float * float) : turtle =
   if degre = 0 then
     try_exec turtle (system.interp symbol) draw
   else
@@ -67,22 +72,26 @@ let rec rewrite_aux turtle system degre symbol draw =
     fun_aux turtle res
 ;;
 
-let rewrite turtle system degre draw =
-	let rec fun_aux turtle s =
-		match s with
-		| "" -> turtle
-		| s ->
-           let sub = String.sub s 1 (String.length s - 1) in
-           fun_aux (rewrite_aux turtle system degre (String.make 1 s.[0]) draw) sub
-	in
-	fun_aux turtle (string_of_word system.axiom)
+(** calls rewrite_aux on each symbole of the axiom *)
+let rewrite (turtle: turtle) (system: 's system) (degre: int) (draw: float * float) : turtle =
+  let rec fun_aux turtle s =
+	match s with
+	| "" -> turtle
+	| s ->
+       let sub = String.sub s 1 (String.length s - 1) in
+       fun_aux (rewrite_aux turtle system degre (String.make 1 s.[0]) draw) sub
+  in
+  fun_aux turtle (string_of_word system.axiom)
 ;;
 
+(** default L-systeme file *)
 let path = "./examples/br1.sys";;
 
-let iter = 5;;
+(** default number of iterations *)
+let iter = 2;;
 
-let start file nb =
+(** start the calcul for the size of the graph and then draw the graph *)
+let start (file: string) (nb: int) : unit =
   let taillex = 1000. in
   let tailley = 1000. in
   let system = interpret_file file in
@@ -107,9 +116,12 @@ let start file nb =
                  else if abs (int_of_float (posymax -. middley)) < abs (int_of_float (posymin -. middley))
                  then posymax else posymin
                ) in
-  open_window (int_of_float taillex) (int_of_float tailley);
-  let turle_fin = rewrite (create_turtle_at posx posy) system nb (min coefx coefy, min coefx coefy) in
-  close_after_event ()
+  try
+    open_window (int_of_float taillex) (int_of_float tailley);
+    let turle_fin = rewrite (create_turtle_at posx posy) system nb (min coefx coefy, min coefx coefy) in
+    close_after_event ()
+  with
+    Graphic_failure s -> exit 0
 ;;
 
 (** Gestion des arguments de la ligne de commande.
@@ -120,14 +132,17 @@ let usage = (* Entete du message d'aide pour --help *)
   "Interpretation de L-systemes et dessins fractals"
 ;;
 
-let extra_arg_action = fun s -> failwith ("Argument inconnu :"^s);;
+(** launch error if unknown argument in command line *)
+let extra_arg_action = fun s -> failwith ("Argument inconnu :" ^ s);;
 
-let action_what () =
+(** print the string usage if -what is in the command line *)
+let action_what () : unit =
  print_string (usage ^ "\n");
  exit 0
 ;;
 
-let action_file () =
+(** launch start function with correct arguments if -c option is in command line *)
+let action_file () : unit =
   begin
     match Array.length Sys.argv with
     | 1 | 2 -> start path iter
@@ -136,7 +151,8 @@ let action_file () =
          try
            let x = int_of_string Sys.argv.(2) in
            start path x
-         with Failure _ -> start Sys.argv.(2) iter
+         with
+           Failure _ -> start Sys.argv.(2) iter
        end
     | _ ->
        begin
@@ -144,15 +160,16 @@ let action_file () =
            let x = int_of_string Sys.argv.(2) in
            start Sys.argv.(3) x
 	     with Failure _ ->
-               try
-                 start Sys.argv.(2) (int_of_string Sys.argv.(3))
-               with Failure _ -> failwith "Il faut donner un nombre sur un des deux paramètres!"
-
+           try
+             start Sys.argv.(2) (int_of_string Sys.argv.(3))
+           with
+             Failure _ -> failwith "Il faut donner un nombre sur un des deux paramètres!"
        end
   end;
-    exit 0
+  exit 0
 ;;
 
+(** list of all caugth command line option *)
 let cmdline_options =
   [
     ("--what" , Arg.Unit action_what, "description");
@@ -164,11 +181,11 @@ let cmdline_options =
   ]
 ;;
 
-let main () =
+(** parse the command line and launch start *)
+let main () : unit =
   Arg.parse cmdline_options extra_arg_action usage;
   start path iter
 ;;
-(** On ne lance ce main que dans le cas d'un programme autonome
-    (c'est-à-dire que l'on est pas dans un "toplevel" ocaml interactif).
-    Sinon c'est au programmeur de lancer ce qu'il veut *)
-let () = if not !Sys.interactive then main ();;
+
+(** launch main if we are not in interactive mod *)
+let () : unit = if not !Sys.interactive then main ();;
