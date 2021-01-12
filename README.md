@@ -19,7 +19,7 @@ Par défaut, `make` est seulement utilisé pour abréger les commandes `dune` (v
 
 Enfin pour lancer le programme: `./run` suffit.  
 Vous pouvez également spécifiez un fichier L-système et/ou un nombre spécifique d'itérations via la l'option `-c`.  
-Par exmple : `./run -c examples/br1.sys 4`  
+Par exmple : `./run -c examples/snow.sys 5`  
 
 ## Fichiers L-systèmes
 
