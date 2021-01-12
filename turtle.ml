@@ -118,7 +118,7 @@ let rec calc_commands (t: turtle) (l: command list) ((hp, vp, hn, vn): float * f
 
 (** Execute the turtle command as a graphics command add applies the coef in line length i *)
 let exec_command (t: turtle) (c: command) ((coefx, coefy): float * float) : (turtle) =
-  set_color ((current_x()+current_y()) * (0xFFFFFF / 1000+1000));
+  set_color ((current_x()+current_y()) * (0xFFFFFF / (1000+1000)));
   match c with
 
   | Line i -> (* move while drawing by i * coef pixels *)
