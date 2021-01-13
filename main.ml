@@ -111,7 +111,7 @@ let start (file: string) (nb: int) : unit =
                  (((taillex -. (coef *. (xmax -. xmin))) /. 2.) -. (coef *. xmin))
                ) in
   let posy = int_of_float (
-                 (((tailley -. (coefy *. (ymax -. ymin))) /. 2.) -. (coefy *. ymin))
+                 (((tailley -. (coef *. (ymax -. ymin))) /. 2.) -. (coef *. ymin))
                ) in
   print_float (coefy *. (ymax -. ymin)); print_string " "; print_float ymax;  print_string "\n";
   try

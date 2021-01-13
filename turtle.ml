@@ -54,7 +54,7 @@ let create_turtle () : turtle =
 let calc_size (t: turtle) (c: command) ((hp, vp, hn, vn): (float * float * float * float))
     : (float * float * float * float * turtle) =
   match c with
-    
+
     | Move i | Line i ->
      let newx = (float_of_int i) *. (cos ((t.current_pos.a /. 180.) *. pi)) in
 	 let newx = round newx in
@@ -128,7 +128,7 @@ let exec_command (t: turtle) (c: command) ((coefx, coefy): float * float) : (tur
      let newy = coefy *. i *. (sin ((t.current_pos.a /. 180.) *. pi)) in
 	 let newy = round newy in
      let newy = int_of_float (newy +. t.current_pos.y) in
-     let time = if coefx < 1. then coefx *. 0.05 /. i else if coefy < 0. then coefy *. 0.05 /. i else 0.05 /. i in
+     let time = if coefx < 1. then coefx *. 0.02 /. i else if coefy < 0. then coefy *. 0.02 /. i else 0.02 /. i in
      Unix.sleepf(time);
      lineto (newx) (newy);
      {current_pos = {
