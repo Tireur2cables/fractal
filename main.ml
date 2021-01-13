@@ -115,9 +115,6 @@ let start (file: string) (nb: int) : unit =
   let posy = int_of_float (
               (((tailley -. (coef *. (ymax -. ymin))) /. 2.) -. (coef *. ymin))
                ) in
-  print_float (
-              (((tailley -. (coef *. (ymax -. ymin))) /. 2.) -. (coef *. ymin))
-               -. 3.); print_string " ";
   try
     open_window (int_of_float taillex) (int_of_float tailley);
     let turle_fin = rewrite (create_turtle_at posx posy) system nb (coef, coef) in
