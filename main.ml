@@ -98,8 +98,9 @@ let start (file: string) (nb: int) : unit =
   let ((xmax, ymax, xmin, ymin), turtlef) = calc (create_turtle ()) system nb (0., 0., 0., 0.) in
   let coefx = xmax -. xmin in
   let coefy = ymax -. ymin in
-  let coefx = if coefx <= taillex then 1. else taillex /. coefx in
-  let coefy = if coefy <= tailley then 1. else tailley /. coefy in
+  let coefx = taillex /. coefx in
+  let coefy = tailley /. coefy in
+  let coef = min coefx coefy in
   let posxmax = taillex -. (xmax *. coefx) in
   let posymax = tailley -. (ymax *. coefy) in
   let posxmin = 0. -. (xmin *. coefx) in
@@ -107,18 +108,15 @@ let start (file: string) (nb: int) : unit =
   let middlex = taillex /. 2. in
   let middley = tailley /. 2. in
   let posx = int_of_float (
-                 if middlex +. xmax < taillex && middlex -. xmin > 0. then middlex
-                 else if abs (int_of_float (posxmax -. middlex)) < abs (int_of_float (posxmin -. middlex))
-                 then posxmax else posxmin
+                 (((taillex -. (coef *. (xmax -. xmin))) /. 2.) -. (coef *. xmin))
                ) in
   let posy = int_of_float (
-                 if middley +. ymax < tailley && middley -. ymin > 0. then middley
-                 else if abs (int_of_float (posymax -. middley)) < abs (int_of_float (posymin -. middley))
-                 then posymax else posymin
+                 (((tailley -. (coefy *. (ymax -. ymin))) /. 2.) -. (coefy *. ymin))
                ) in
+  print_float (coefy *. (ymax -. ymin)); print_string " "; print_float ymax;  print_string "\n";
   try
     open_window (int_of_float taillex) (int_of_float tailley);
-    let turle_fin = rewrite (create_turtle_at posx posy) system nb (min coefx coefy, min coefx coefy) in
+    let turle_fin = rewrite (create_turtle_at posx posy) system nb (coef, coef) in
     close_after_event ()
   with
     Graphic_failure s -> exit 0
