@@ -57,7 +57,8 @@ let calc (turtle: turtle) (system: 's system) (degre: int)
 ;;
 
 (** transform the symbol a correct number of times and call the try_exec for each symbol when finish *)
-let rec rewrite_aux (turtle: turtle) (system: 's system) (degre: int) (symbol: string) (draw: float * float) : turtle =
+let rec rewrite_aux (turtle: turtle) (system: 's system) (degre: int)
+                    (symbol: string) (draw: float * float) : turtle =
   if degre = 0 then
     try_exec turtle (system.interp symbol) draw
   else
@@ -73,7 +74,8 @@ let rec rewrite_aux (turtle: turtle) (system: 's system) (degre: int) (symbol: s
 ;;
 
 (** calls rewrite_aux on each symbole of the axiom *)
-let rewrite (turtle: turtle) (system: 's system) (degre: int) (draw: float * float) : turtle =
+let rewrite (turtle: turtle) (system: 's system) (degre: int)
+                              (draw: float * float) : turtle =
   let rec fun_aux turtle s =
 	match s with
 	| "" -> turtle
@@ -88,7 +90,7 @@ let rewrite (turtle: turtle) (system: 's system) (degre: int) (draw: float * flo
 let path = "./examples/br1.sys";;
 
 (** default number of iterations *)
-let iter = 2;;
+let iter = 3;;
 
 (** start the calcul for the size of the graph and then draw the graph *)
 let start (file: string) (nb: int) : unit =
@@ -108,12 +110,14 @@ let start (file: string) (nb: int) : unit =
   let middlex = taillex /. 2. in
   let middley = tailley /. 2. in
   let posx = int_of_float (
-                 (((taillex -. (coef *. (xmax -. xmin))) /. 2.) -. (coef *. xmin))
+              (((taillex -. (coef *. (xmax -. xmin))) /. 2.) -. (coef *. xmin))
                ) in
   let posy = int_of_float (
-                 (((tailley -. (coef *. (ymax -. ymin))) /. 2.) -. (coef *. ymin))
+              (((tailley -. (coef *. (ymax -. ymin))) /. 2.) -. (coef *. ymin))
                ) in
-  print_float (coefy *. (ymax -. ymin)); print_string " "; print_float ymax;  print_string "\n";
+  print_float (
+              (((tailley -. (coef *. (ymax -. ymin))) /. 2.) -. (coef *. ymin))
+               -. 3.); print_string " ";
   try
     open_window (int_of_float taillex) (int_of_float tailley);
     let turle_fin = rewrite (create_turtle_at posx posy) system nb (coef, coef) in
