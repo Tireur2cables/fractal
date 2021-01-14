@@ -1,6 +1,7 @@
 (library
  (name lsystems)
  (modules (:standard \ main))
+ (libraries graphics unix)
  (flags :standard -w -27-26-32)
 )
 

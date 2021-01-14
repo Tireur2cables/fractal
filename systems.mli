@@ -13,3 +13,7 @@ type 's system = {
     interp : 's -> Turtle.command list }
 
 (** Put here any type and function interfaces concerning systems *)
+
+val interpret_file : string -> string system
+
+val string_of_word : string word -> string
