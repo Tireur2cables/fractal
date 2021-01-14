@@ -37,5 +37,5 @@ Pour que votre fichier L-système marche correctement avec notre programme il vo
 
 ## Test du programme
 
-Pour certains L-Systems, l'animation de la tortue rend le programme un peu lent, mais nous n'avons pas eu le temps d'ajouter une option en ligne de commande pour la désactiver. Pour tester plusieurs L-Systems à la suite, vous pouvez commenter la ligne `138` du fichier turtle.ml qui indique `Unix.sleepf(time)` pour désactiver l'animation et gagner un peu de temps. La prochaine étape de programmation aurait été de rajouter des options en lignes de commandes afin de pouvoir permettre à l'utilisateur d'activer ou désactiver aisément couleurs et animations dans le programme.
+Pour certains L-Systems, l'animation de la tortue rend le programme un peu lent, mais nous n'avons pas eu le temps d'ajouter une option en ligne de commande pour la désactiver. Pour tester plusieurs L-Systems à la suite, vous pouvez commenter la ligne `138` du fichier turtle.ml qui indique `Unix.sleepf(time)` pour désactiver l'animation et gagner un peu de temps. La prochaine étape de programmation aurait été de rajouter des options en lignes de commandes afin de permettre à l'utilisateur d'activer ou désactiver aisément couleurs et animations dans le programme.
 
