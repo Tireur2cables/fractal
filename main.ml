@@ -101,8 +101,6 @@ let start (file: string) (nb: int) : unit =
   let ((xmax, ymax, xmin, ymin), turtlef) = calc (create_turtle ()) system nb (0., 0., 0., 0.) in
   let coefx = xmax -. xmin in
   let coefy = ymax -. ymin in
-  print_float coefy;
-  print_float coefx;
   let coefx = if coefx < taillex then taillex /. (coefx *. 1.5) else taillex /. coefx in
   let coefy = if coefy < tailley then tailley /. (coefy *. 1.5) else tailley /. coefy in
   let coef = min coefx coefy in
