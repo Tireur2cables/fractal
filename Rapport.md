@@ -14,8 +14,8 @@ d'itération voulu, puis on l'affiche à l'écran selon son interprétation, et 
 L'interface du programme est `épurée`, disposant uniquement d'une fenêtre affichant le résultat de notre L-système, sur laquelle il suffit de cliquer pour quitter le programme une fois le dessin fini.  
 Le calcul de la taille des bornes du graphique est fait automatiquement par le programme, en exécutant une première fois le L-Système, pour calculer sa taille d'affichage. Cela nous permet lors d'un second calcul du L-système, et de son affichage, d'appliquer un coefficient multiplicateur sur les actions de déplacement, `lineto` et `moveto`, de la tortue.  
 Le calcul de la taille et du placement de la forme nous ont posé beaucoup de problèmes, notamment avec le type `Float` et les arrondis nécessaires lors de l'affichage du graphique qui peuvent entraîner un refus de coopérer de la part de notre très cher tortue qui ne peut pas afficher à l'écran des moitiés de pixels.  
-Cependant nous avons autorisé notre tortue à ce reposer un court moment entre deux traits ce qui créer une animation du dessin. Ce laps de temps est calculer par rapport à la taille du dessin et longueur des traits. (cf README.md pour désactiver l'animation pour les tests).  
-Nous avons aussi rajouté certaines couleurs pour le dessin. Afin d'obtenir un résultat lisible et agréable, nous prenons la couleur en fonction de la position du trait dans la fenêtre, formant ainsi un `degradé` de la fréquence d'apparation des couleurs.  
+Cependant nous avons autorisé notre tortue à se reposer un court moment entre deux traits ce qui créer une animation du dessin. Ce laps de temps est calculé par rapport à la taille du dessin et la longueur des traits. (cf README.md pour désactiver l'animation pour les tests).  
+Nous avons aussi rajouté certaines couleurs pour le dessin. Afin d'obtenir un résultat lisible et agréable, nous choississons la couleur en fonction de la position du trait dans la fenêtre, formant ainsi un `degradé` de la fréquence d'apparation des couleurs.  
 
 
 ## COMPILATION ET EXÉCUTION
