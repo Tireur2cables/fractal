@@ -6,6 +6,7 @@ open Graphics;;
 (** open a graphic window of size w * h *)
 let open_window w h =
   open_graph (" " ^ (string_of_int w) ^ "x" ^ (string_of_int h));
+  fill_rect 0 0 w h;
   auto_synchronize true
 ;;
 
@@ -100,15 +101,9 @@ let start (file: string) (nb: int) : unit =
   let ((xmax, ymax, xmin, ymin), turtlef) = calc (create_turtle ()) system nb (0., 0., 0., 0.) in
   let coefx = xmax -. xmin in
   let coefy = ymax -. ymin in
-  let coefx = taillex /. coefx in
-  let coefy = tailley /. coefy in
+  let coefx = if coefx < taillex then taillex /. (coefx *. 1.5) else taillex /. coefx in
+  let coefy = if coefy < tailley then tailley /. (coefy *. 1.5) else tailley /. coefy in
   let coef = min coefx coefy in
-  let posxmax = taillex -. (xmax *. coefx) in
-  let posymax = tailley -. (ymax *. coefy) in
-  let posxmin = 0. -. (xmin *. coefx) in
-  let posymin = 0. -. (ymin *. coefy) in
-  let middlex = taillex /. 2. in
-  let middley = tailley /. 2. in
   let posx = int_of_float (
               (((taillex -. (coef *. (xmax -. xmin))) /. 2.) -. (coef *. xmin))
                ) in
