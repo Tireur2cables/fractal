@@ -117,24 +117,24 @@ let rec calc_commands (t: turtle) (l: command list) ((hp, vp, hn, vn): float * f
 ;;
 
 (** Execute the turtle command as a graphics command add applies the coef in line length i *)
-let exec_command (t: turtle) (c: command) ((coefx, coefy): float * float)
-	: (turtle) =
+let exec_command (t: turtle) (c: command) ((coef): float) : (turtle) =
+  
   set_color ((current_x()+current_y()) * (0xFFFFFF / (1000+1000)));
   match c with
 
   | Line i -> (* move while drawing by i * coef pixels *)
      let i = float_of_int (if i mod 2 = 0 then i else i + 1) in
-     let newx = coefx *. i *. (cos ((t.current_pos.a /. 180.) *. pi)) in
+     let newx = coef *. i *. (cos ((t.current_pos.a /. 180.) *. pi)) in
 	 let newx = round newx in
      let newx = int_of_float (newx +. t.current_pos.x) in
-     let newy = coefy *. i *. (sin ((t.current_pos.a /. 180.) *. pi)) in
+     let newy = coef *. i *. (sin ((t.current_pos.a /. 180.) *. pi)) in
 	 let newy = round newy in
      let newy = int_of_float (newy +. t.current_pos.y) in
-     let time = if coefx > 0.8
-	            then coefx *. 0.0005 *. i
-				else if coefx > 0.25
-				then coefx *. 0.0001 *. i
-				else coefx *. 0.0000001 *. i in
+     let time = if coef > 0.8
+	            then coef *. 0.0005 *. i
+				else if coef > 0.25
+				then coef *. 0.0001 *. i
+				else coef *. 0.0000001 *. i in
      Unix.sleepf(time);
      lineto (newx) (newy);
      {current_pos = {
@@ -145,9 +145,9 @@ let exec_command (t: turtle) (c: command) ((coefx, coefy): float * float)
 
   | Move i -> (* move without drawing by i * coef pixels *)
      let i = float_of_int (if i mod 2 = 0 then i else i + 1) in
-     let newx = coefx *. i *. (cos ((t.current_pos.a /. 180.) *. pi)) in
+     let newx = coef *. i *. (cos ((t.current_pos.a /. 180.) *. pi)) in
      let newx = int_of_float (newx +. t.current_pos.x) in
-     let newy = coefy *. i *. (sin ((t.current_pos.a /. 180.) *. pi)) in
+     let newy = coef *. i *. (sin ((t.current_pos.a /. 180.) *. pi)) in
      let newy = int_of_float (newy +. t.current_pos.y) in
      moveto (newx) (newy);
      {current_pos = {
@@ -181,10 +181,10 @@ let exec_command (t: turtle) (c: command) ((coefx, coefy): float * float)
 ;;
 
 (** Calls exec_command for each command of the list *)
-let rec exec_commands (t: turtle) (l: command list) ((coefx, coefy) : (float * float)) : turtle =
+let rec exec_commands (t: turtle) (l: command list) ((coef) : float) : turtle =
   match l with
   | [] -> t
   | x :: l ->
-     let turtle = exec_command t x (coefx, coefy) in
-     exec_commands turtle l (coefx, coefy)
+     let turtle = exec_command t x coef in
+     exec_commands turtle l coef
 ;;

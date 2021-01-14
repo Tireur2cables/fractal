@@ -16,75 +16,103 @@ let close_after_event () : unit =
 ;;
 
 (** try to execute the list of commands and eventually catch a Restoration exception *)
-let try_exec (t: turtle) (l: command list) ((coefx, coefy): float * float ) : (turtle) =
+let try_exec (t: turtle) (l: command list) (coef: float) : (turtle) =
   try
-    exec_commands t l (coefx, coefy)
+    exec_commands t l coef
   with
   | Restoration_failure s ->
      print_string s;
      create_turtle ()
 ;;
 
-(** transform the symbol a correct number of times and call the calc_commands for each symbol when finish *)
-let rec calc_aux (turtle: turtle) (system: 's system) (degre: int) (symbol: string)
-          ((hp, vp, hn, vn): float * float * float *float) : (float * float * float * float * turtle) =
+(** transform the symbol a correct number of times and calls the calc_commands for each symbol when finish *)
+let rec trans_calc (turtle: turtle) (syst: 's system) (degre: int) (symb: string)
+          ((hp, vp, hn, vn): float * float * float *float) :
+          (float * float * float * float * turtle) =
   if degre = 0 then
-    calc_commands turtle (system.interp symbol) (hp, vp, hn, vn)
+    calc_commands turtle (syst.interp symb) (hp, vp, hn, vn)
   else
-	let rec fun_aux turtle (hp, vp, hn, vn) s =
+	let rec trans_calc_aux turtle (hp, vp, hn, vn) s =
 	  match s with
 	  | "" -> (hp, vp, hn, vn, turtle)
 	  | s ->
          let sub = String.sub s 1 (String.length s - 1) in
-		 let (xmax, ymax, xmin, ymin, tort) = calc_aux turtle system (degre-1) (String.make 1 s.[0]) (hp, vp, hn, vn) in
-         fun_aux tort (xmax, ymax, xmin, ymin) sub
+         let c = String.make 1 s.[0] in
+         let d = degre - 1 in
+		 let (hp, vp, hn, vn, t) = trans_calc turtle syst d c (hp, vp, hn, vn) in
+         trans_calc_aux t (hp, vp, hn, vn) sub
 	in
-    let res = string_of_word (system.rules symbol) in
-    fun_aux turtle (hp, vp, hn, vn) res
+    let res = string_of_word (syst.rules symb) in
+    trans_calc_aux turtle (hp, vp, hn, vn) res
 ;;
 
-(** calls calc_aux on each symbol of the axiom *)
-let calc (turtle: turtle) (system: 's system) (degre: int)
-      (curr_dim: float * float * float * float) : ((float * float * float * float) * turtle) =
-  let rec fun_aux turtle curr_dim s =
+(** calls trans_calc on each symbol of the axiom *)
+let calc (turtle: turtle) (syst: 's system) (deg: int)
+      (dim: float * float * float * float) :
+      ((float * float * float * float) * turtle) =
+  let rec calc_aux turtle dim s =
 	match s with
-	| "" -> (curr_dim, turtle)
+	| "" -> (dim, turtle)
 	| s ->
        let sub = String.sub s 1 (String.length s - 1) in
-	   let (xmax, ymax, xmin, ymin, tort) = calc_aux turtle system degre (String.make 1 s.[0]) curr_dim in
-       fun_aux tort (xmax, ymax, xmin, ymin) sub
+       let c = String.make 1 s.[0] in
+	   let (xmax, ymax, xmin, ymin, tort) = trans_calc turtle syst deg c dim in
+       calc_aux tort (xmax, ymax, xmin, ymin) sub
   in
-  fun_aux turtle curr_dim (string_of_word system.axiom)
+  calc_aux turtle dim (string_of_word syst.axiom)
 ;;
 
 (** transform the symbol a correct number of times and call the try_exec for each symbol when finish *)
-let rec rewrite_aux (turtle: turtle) (system: 's system) (degre: int)
-                    (symbol: string) (draw: float * float) : turtle =
+let rec transform_symb (turtle: turtle) (system: 's system) (degre: int)
+          (symbol: string) (coef: float) : turtle =
   if degre = 0 then
-    try_exec turtle (system.interp symbol) draw
+    try_exec turtle (system.interp symbol) coef
   else
-	let rec fun_aux turtle s =
+	let rec transform_symb_aux turtle s =
 	  match s with
 	  | "" -> turtle
 	  | s ->
          let sub = String.sub s 1 (String.length s - 1) in
-         fun_aux (rewrite_aux turtle system (degre-1) (String.make 1 s.[0]) draw) sub
+         let c = String.make 1 s.[0] in
+         transform_symb_aux (transform_symb turtle system (degre-1) c coef) sub
 	in
     let res = string_of_word (system.rules symbol) in
-    fun_aux turtle res
+    transform_symb_aux turtle res
 ;;
 
-(** calls rewrite_aux on each symbole of the axiom *)
-let rewrite (turtle: turtle) (system: 's system) (degre: int)
-                              (draw: float * float) : turtle =
-  let rec fun_aux turtle s =
+(** calls transform_symb on each symbole of the axiom *)
+let transform_system (turtle: turtle) (system: 's system) (degre: int)
+      (coef: float) : turtle =
+  let rec transform_system_aux turtle s =
 	match s with
 	| "" -> turtle
 	| s ->
        let sub = String.sub s 1 (String.length s - 1) in
-       fun_aux (rewrite_aux turtle system degre (String.make 1 s.[0]) draw) sub
+       let c = String.make 1 s.[0] in
+       transform_system_aux (transform_symb turtle system degre c coef) sub
   in
-  fun_aux turtle (string_of_word system.axiom)
+  transform_system_aux turtle (string_of_word system.axiom)
+;;
+
+(** Calcul for coef and posx posy *)
+let calc_pos ((xmax, ymax, xmin, ymin) : (float * float * float * float))
+      ((taillex, tailley) : (float * float)) : (float * int * int)  =
+  let sizex = xmax -. xmin in
+  let sizey = ymax -. ymin in
+  let coefx = if sizex < taillex
+              then taillex /. (sizex *. 1.5)
+              else taillex /. sizex in
+  let coefy = if sizey < tailley
+              then tailley /. (sizey *. 1.5)
+              else tailley /. sizey in
+  let coef = min coefx coefy in
+  let posx = int_of_float (
+                 (((taillex -. (coef *. (xmax -. xmin))) /. 2.) -. (coef *. xmin))
+               ) in
+  let posy = int_of_float (
+                 (((tailley -. (coef *. (ymax -. ymin))) /. 2.) -. (coef *. ymin))
+               ) in
+  (coef, posx, posy)
 ;;
 
 (** default L-systeme file *)
@@ -98,21 +126,16 @@ let start (file: string) (nb: int) : unit =
   let taillex = 1000. in
   let tailley = 1000. in
   let system = interpret_file file in
-  let ((xmax, ymax, xmin, ymin), turtlef) = calc (create_turtle ()) system nb (0., 0., 0., 0.) in
-  let coefx = xmax -. xmin in
-  let coefy = ymax -. ymin in
-  let coefx = if coefx < taillex then taillex /. (coefx *. 1.5) else taillex /. coefx in
-  let coefy = if coefy < tailley then tailley /. (coefy *. 1.5) else tailley /. coefy in
-  let coef = min coefx coefy in
-  let posx = int_of_float (
-              (((taillex -. (coef *. (xmax -. xmin))) /. 2.) -. (coef *. xmin))
-               ) in
-  let posy = int_of_float (
-              (((tailley -. (coef *. (ymax -. ymin))) /. 2.) -. (coef *. ymin))
-               ) in
+  let coords = (0., 0., 0., 0.) in
+  let turtle = create_turtle () in
+  let ((xmax, ymax, xmin, ymin), _) = calc turtle system nb coords in
+
+  let (coef, posx, posy) = calc_pos (xmax, ymax, xmin, ymin) (taillex, tailley) in
+
   try
     open_window (int_of_float taillex) (int_of_float tailley);
-    let turle_fin = rewrite (create_turtle_at posx posy) system nb (coef, coef) in
+    let turtle = create_turtle_at posx posy in
+    let turle_fin = transform_system turtle system nb coef in
     close_after_event ()
   with
     Graphic_failure s -> exit 0
@@ -131,8 +154,8 @@ let extra_arg_action = fun s -> failwith ("Argument inconnu :" ^ s);;
 
 (** print the string usage if -what is in the command line *)
 let action_what () : unit =
- print_string (usage ^ "\n");
- exit 0
+  print_string (usage ^ "\n");
+  exit 0
 ;;
 
 (** launch start function with correct arguments if -c option is in command line *)

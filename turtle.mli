@@ -36,7 +36,7 @@ val calc_size : turtle -> command -> (float * float * float * float) -> (float *
 val calc_commands : turtle -> command list -> (float * float * float * float) -> (float * float * float * float * turtle)
 
 (** Execute the turtle command as a graphics command add applies the coef in line length i *)
-val exec_command : turtle -> command -> (float * float) -> turtle
+val exec_command : turtle -> command -> float -> turtle
 
 (** Calls exec_command for each command of the list *)
-val exec_commands : turtle -> command list -> (float * float) -> turtle
+val exec_commands : turtle -> command list -> float -> turtle
